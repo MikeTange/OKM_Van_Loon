@@ -7,7 +7,7 @@
 
 # ### Imports ###
 
-# In[100]:
+# In[192]:
 
 
 import pandas as pd
@@ -16,7 +16,7 @@ import numpy as np
 
 # ### Objects ###
 
-# In[101]:
+# In[193]:
 
 
 class recipe:
@@ -40,7 +40,7 @@ class recipe:
 # #### BOM ####
 # 
 
-# In[102]:
+# In[194]:
 
 
 bom_data_raw = pd.read_excel("250410 Recepten download NAV 10-4.xlsx", skiprows=1, header=None, decimal=",")
@@ -48,7 +48,7 @@ bom_data_raw = pd.read_excel("250410 Recepten download NAV 10-4.xlsx", skiprows=
 
 # #### Prices & weights ####
 
-# In[103]:
+# In[195]:
 
 
 price_weight_data = pd.read_excel("Input Price List + Grammage.xlsx", sheet_name="PriceList", header=0).astype({'INGREDIENT CODE': 'string'})
@@ -56,7 +56,7 @@ price_weight_data = pd.read_excel("Input Price List + Grammage.xlsx", sheet_name
 
 # #### Waste ####
 
-# In[104]:
+# In[196]:
 
 
 waste_data = pd.read_excel("Input Waste Table.xlsx", sheet_name='WASTE', header=0).astype({'MEAL CODE': "string", 'INGREDIENT CODE': 'string'})
@@ -64,7 +64,7 @@ waste_data = pd.read_excel("Input Waste Table.xlsx", sheet_name='WASTE', header=
 
 # ##### Add unique id column #####
 
-# In[105]:
+# In[197]:
 
 
 waste_data['id'] = waste_data[['MEAL CODE', 'INGREDIENT CODE']].agg('_'.join, axis=1).astype('string')
@@ -72,7 +72,7 @@ waste_data['id'] = waste_data[['MEAL CODE', 'INGREDIENT CODE']].agg('_'.join, ax
 
 # #### Product master ####
 
-# In[106]:
+# In[198]:
 
 
 product_data = pd.read_excel("Input Productmaster.xlsx", sheet_name='Product')
@@ -80,13 +80,13 @@ product_data = pd.read_excel("Input Productmaster.xlsx", sheet_name='Product')
 
 # ##### Active recipes #####
 
-# In[107]:
+# In[199]:
 
 
 active_rec_data = pd.read_excel("Input Productmaster.xlsx", sheet_name='Actief')
 
 
-# In[108]:
+# In[200]:
 
 
 active_recipes = [str(x) for x in active_rec_data[active_rec_data['Actief'] == 'Ja']['Artikel']]
@@ -95,7 +95,7 @@ active_recipes = [str(x) for x in active_rec_data[active_rec_data['Actief'] == '
 # ##### Split product data by categorie #####
 # Store the ids ('hf_nr') in NumPy arrays for easy and fast checking against later.
 
-# In[109]:
+# In[201]:
 
 
 product_data_ingredient = np.array(product_data[product_data['Categorie'] == 'Ingredient']['Nummer'])
@@ -110,7 +110,7 @@ product_data_gas = np.array(product_data[product_data['Categorie'] == 'Gas']['Nu
 
 # ##### Split data into recipes #####
 
-# In[110]:
+# In[202]:
 
 
 recipes = []
@@ -138,22 +138,22 @@ for i in range(len(bom_data_raw)):
 # ##### Drop inactive recipes #####
 # Keep this separate for now in case it has to be removed later.
 
-# In[111]:
+# In[ ]:
 
 
-# recipes_temp = []
-# for recipe in recipes:
-#     if str(recipe.id) in active_recipes:
-#         recipes_temp.append(recipe)
+recipes_temp = []
+for recipe in recipes:
+    if str(recipe.id) in active_recipes:
+        recipes_temp.append(recipe)
 
-# recipes = recipes_temp 
+recipes = recipes_temp
 
 
 # ## Modeling ##
 
 # ### Add categories ###
 
-# In[112]:
+# In[204]:
 
 
 for recipe in recipes:
@@ -183,7 +183,7 @@ for recipe in recipes:
 # ### New prices ###
 # From price list for ingredients & gas; 0 for packaging; and empty for HFs.
 
-# In[113]:
+# In[205]:
 
 
 for recipe in recipes:
@@ -213,7 +213,7 @@ for recipe in recipes:
 # ### Old prices ###
 # Old costs / old quantity for ingredients & gas; 0 for packaging; and empty for HFs.
 
-# In[114]:
+# In[206]:
 
 
 for recipe in recipes:
@@ -240,18 +240,21 @@ for recipe in recipes:
 
 
 # ### Weight in kg ###
-# Convert items not in kg. Items already in kg stay the same.
+# Convert items not in kg. Items already in kg stay the same. Packaging goes to 0, regardless of the unit.
 
-# In[115]:
+# In[207]:
 
 
 for recipe in recipes:
     weights = []
 
     for i in range(len(recipe.data)):
-        if not recipe.data['Basiseenheid'][i] == 'KG':
+        item_id = recipe.data['hf_nr'][i]
 
-            item_id = recipe.data['hf_nr'][i]
+        if item_id in product_data_packaging: # packaging to 0
+            weight = 0.0
+
+        elif not recipe.data['Basiseenheid'][i] == 'KG':
 
             subset_weight_data = price_weight_data[price_weight_data['INGREDIENT CODE'] == item_id]
 
@@ -275,7 +278,7 @@ for recipe in recipes:
 # ### Waste ###
 # For items at level 1: find the waste in the waste data. For all other items, find the parent item at level 1, and take the waste from there.
 
-# In[116]:
+# In[208]:
 
 
 for recipe in recipes:
@@ -353,7 +356,7 @@ for recipe in recipes:
 # ### Quantities ###
 # Calculate the quantities based on the known waste data.
 
-# In[117]:
+# In[209]:
 
 
 for recipe in recipes:
@@ -388,7 +391,7 @@ for recipe in recipes:
 
 # #### Non-HF costs ####
 
-# In[118]:
+# In[ ]:
 
 
 for recipe in recipes:
@@ -403,7 +406,7 @@ for recipe in recipes:
                 newp_oldq = recipe.data['Nieuwe prijs'][i] * recipe.data['Aantal (Basis)'][i]
                 newp_newq = recipe.data['Nieuwe prijs'][i] * recipe.data['Aantal (nieuw)'][i]
 
-            except TypeError: # TODO - could use the old price here as well
+            except TypeError: # could use the old price here as well
                 newp_oldq = 'Kan niet berekenen'
                 newp_newq = 'Kan niet berekenen'
 
@@ -425,7 +428,7 @@ for recipe in recipes:
 # #### HF costs ####
 # For an HF the costs are determined based on the costs of the individual ingredients which make up the HF.
 
-# In[119]:
+# In[211]:
 
 
 for recipe in recipes:
@@ -471,7 +474,7 @@ for recipe in recipes:
 
 # ### Deltas ###
 
-# In[120]:
+# In[212]:
 
 
 for recipe in recipes:
@@ -504,7 +507,7 @@ for recipe in recipes:
 
 # ### BOM ###
 
-# In[121]:
+# In[213]:
 
 
 frames = []
@@ -514,11 +517,79 @@ for recipe in recipes:
 BOM_df = pd.concat(frames)
 
 
+# ### Excel file formatting ###
+# Change column order and names. Drop a few columns.
+
+# In[214]:
+
+
+# Reorder and drop columns
+BOM_df = BOM_df[['index', 'id_nr', 'Product Naam', 'nr', 'Niveau', 'hf_nr', 'Omschrijving', 'Aantal (Basis)', 'Basiseenheid', 'Materiaalkosten', 'Categorie', 'Nieuwe prijs', 
+                 'Nieuwe vvp', 'Waste NAV', 'Waste FIN', 'Waste USE', 'Aantal (zonder waste)', 'Aantal (nieuw)', 'Materiaalkosten (nieuw)', 'Delta materiaalkosten', 'Delta Q', 
+                 'Delta prijs', 'Grammage']]
+
+# Rename columns
+BOM_df = BOM_df.rename(columns={"index": "Index",
+                                'id_nr': 'Meal ID',
+                                'Product Naam': 'Meal Name',
+                                'nr': 'Volgnummer',
+                                'Niveau': 'Level',
+                                'hf_nr': 'Ingredient ID',
+                                'Omschrijving': 'Ingredient Name',
+                                'Aantal (Basis)': 'Aantal (Basis) (#)',
+                                'Materiaalkosten': 'Materiaalkosten (€)',
+                                'Nieuwe Prijs': 'Ingredientprijs (nieuw) (€)',
+                                'Nieuwe vvp': 'VVP (nieuw) (€)',
+                                'Waste NAV': 'Uitval NAV (%)',
+                                'Waste FIN': 'Uitval FIN (%)',
+                                'Waste USE': 'Uitval USE (%)',
+                                'Aantal (zonder waste)': 'Aantal uitval EXL (#)',
+                                'Aantal (nieuw)': 'Aantal uitval USE (#)',
+                                'Materiaalkosten (nieuw)': 'Materiaalkosten (nieuw) (€)',
+                                'Delta materiaalkosten': 'Materiaalkosten (delta) (€)',
+                                'Delta Q': 'Materiaalkosten (Q-Effect) (€)',
+                                'Delta prijs': 'Materiaalkosten (P-Effect) (€)',
+                                'Grammage': 'Gewicht (kg)'
+                                })
+
+
 # ### Save to Excel ###
 
-# In[122]:
+# In[ ]:
 
 
-with pd.ExcelWriter("Output v4 (inclusief inactief).xlsx") as writer:
+with pd.ExcelWriter("Output v5.xlsx") as writer:
     BOM_df.to_excel(writer, sheet_name="BOM")
+
+
+# ## Convert Notebook to .py ##
+
+# In[ ]:
+
+
+import nbformat
+from nbconvert import ScriptExporter
+import os
+
+def export_this_notebook(output_script="local_runner.py"):
+    try:
+        notebook_path = __vsc_ipynb_file__
+        print(f"Detected notebook: {notebook_path}")
+    except NameError:
+        print("Could not auto-detect notebook path. This only works in VS Code.")
+        return
+
+    with open(notebook_path, 'r', encoding='utf-8') as f:
+        nb_node = nbformat.read(f, as_version=4)
+
+    exporter = ScriptExporter()
+    script, _ = exporter.from_notebook_node(nb_node)
+
+    with open(output_script, 'w', encoding='utf-8') as out_file:
+        out_file.write(script)
+
+    print(f"Exported notebook to '{output_script}'")
+
+# Run it
+export_this_notebook()
 

@@ -3,7 +3,7 @@ import subprocess
 import os
 
 # Customize this
-GITHUB_RAW_URL = "https://github.com/MikeTange/OKM_Van_Loon/local_runner.py"
+GITHUB_RAW_URL = "https://raw.githubusercontent.com/MikeTange/OKM_Van_Loon/refs/heads/main/local_runner.py"
 
 print("Downloading latest script from GitHub...")
 response = requests.get(GITHUB_RAW_URL)
