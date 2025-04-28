@@ -7,17 +7,18 @@
 
 # ### Imports ###
 
-# In[206]:
+# In[3]:
 
 
 import pandas as pd
 import numpy as np
 import warnings
+import openpyxl
 
 
 # ### Objects ###
 
-# In[178]:
+# In[4]:
 
 
 class recipe:
@@ -36,7 +37,7 @@ class recipe:
 
 # ### Functions ###
 
-# In[179]:
+# In[5]:
 
 
 def rename_nan_columns(df, prefix="col"):
@@ -90,21 +91,30 @@ def clean_dataframe(df, replace_empty_with_na=True):
 
 # ### Input parameters ###
 
-# In[180]:
+# In[6]:
 
 
+# BOM
 bom_name = "250416 Recepten download NAV 16-4.xlsx"
 bom_sheet_name = "Budget"
+
+# Prices & weights
 price_weight_name = "Input Price List + Grammage.xlsx"
 price_weight_sheet_name = "PriceList"
+
+# Waste
 waste_name = "Input Waste Table.xlsx"
 waste_sheet_name = 'WASTE'
+
+# Active recipes
+active_rec_name = "Input Actieve Recepten Master.xlsx"
+active_rec_sheet = "Actief"
 
 
 # ### Required columns ###
 # Price and weight data
 
-# In[181]:
+# In[7]:
 
 
 req_cols_price_weight = ['INGREDIENT CODE', 'INGREDIENTS', 'KG']
@@ -112,10 +122,18 @@ req_cols_price_weight = ['INGREDIENT CODE', 'INGREDIENTS', 'KG']
 
 # Waste data
 
-# In[182]:
+# In[8]:
 
 
 req_cols_waste = ['MEAL CODE', 'INGREDIENT CODE', 'WASTE-NAV', 'WASTE-FIN', 'WASTE-USE']
+
+
+# Active recipes data
+
+# In[9]:
+
+
+req_cols_act_rec = ['Artikel']
 
 
 # ### Data loading & initial validation ###
@@ -123,13 +141,13 @@ req_cols_waste = ['MEAL CODE', 'INGREDIENT CODE', 'WASTE-NAV', 'WASTE-FIN', 'WAS
 # #### BOM ####
 # 
 
-# In[183]:
+# In[10]:
 
 
 bom_data_raw = pd.read_excel(bom_name, sheet_name=bom_sheet_name, skiprows=1, header=None, decimal=",")
 
 
-# In[184]:
+# In[11]:
 
 
 print(f'BOM ingelezen: {bom_name} || Tabblad: {bom_sheet_name}')
@@ -137,7 +155,7 @@ print(f'BOM ingelezen: {bom_name} || Tabblad: {bom_sheet_name}')
 
 # #### Prices & weights ####
 
-# In[185]:
+# In[12]:
 
 
 price_weight_data_raw = pd.read_excel(price_weight_name, sheet_name=price_weight_sheet_name, header=None)
@@ -162,7 +180,7 @@ if not all(x in price_weight_data.columns for x in req_cols_price_weight):
 price_weight_data = clean_dataframe(price_weight_data).astype({"INGREDIENT CODE": 'string', "INGREDIENTS": 'string'}) # fix incorrect type inferences as strings (universally applicable)
 
 
-# In[186]:
+# In[13]:
 
 
 print(f'Prijs en gewicht lijst ingelezen: {price_weight_name} || Tabblad: {price_weight_sheet_name}')
@@ -170,7 +188,7 @@ print(f'Prijs en gewicht lijst ingelezen: {price_weight_name} || Tabblad: {price
 
 # #### Waste ####
 
-# In[187]:
+# In[14]:
 
 
 waste_data_raw = pd.read_excel(waste_name, sheet_name=waste_sheet_name, header=None)
@@ -189,7 +207,7 @@ waste_data = rename_nan_columns(waste_data)
 
 # Check for required columns
 if not all(x in waste_data.columns for x in req_cols_waste):
-    print(f'Sommige essentiele kolommen missen in de prijslijst: {set(req_cols_waste) - set(waste_data.columns)}')
+    print(f'Sommige essentiele kolommen missen in de waste lijst: {set(req_cols_waste) - set(waste_data.columns)}')
 
 # Clean DataFrame values
 waste_data = clean_dataframe(waste_data).astype({'MEAL CODE': 'string', 'INGREDIENT CODE': 'string', 'UNITS': 'string'}) # fix incorrect type inferences as strings (universally applicable)
@@ -197,16 +215,71 @@ waste_data = clean_dataframe(waste_data).astype({'MEAL CODE': 'string', 'INGREDI
 
 # ##### Add unique id column #####
 
-# In[188]:
+# In[15]:
 
 
 waste_data['id'] = waste_data[['MEAL CODE', 'INGREDIENT CODE']].agg('_'.join, axis=1).astype('string')
 
 
-# In[189]:
+# In[16]:
 
 
 print(f'Waste lijst ingelezen: {waste_name} || Tabblad: {waste_sheet_name}')
+
+
+# #### Active recipes ####
+
+# In[17]:
+
+
+warnings.filterwarnings('ignore', category=UserWarning)
+
+active_rec_data_raw = pd.read_excel(active_rec_name, sheet_name=active_rec_sheet, header=None)
+
+# Drop leading empty rows
+active_rec_data_trimmed = active_rec_data_raw.loc[~active_rec_data_raw.isnull().all(axis=1)].reset_index(drop=True)
+
+# Promote the first non-empty row to header
+header = active_rec_data_trimmed.iloc[0]
+active_rec_data = active_rec_data_trimmed[1:]
+active_rec_data.columns = header
+df = active_rec_data.reset_index(drop=True)
+
+# Rename any columns named: "NaN"
+active_rec_data = rename_nan_columns(active_rec_data)
+
+# Check for required columns
+if not all(x in active_rec_data.columns for x in req_cols_act_rec):
+    print(f'Sommige essentiele kolommen missen in de actieve recepten master: {set(req_cols_act_rec) - set(active_rec_data.columns)}')
+
+# Clean DataFrame values
+active_rec_data = clean_dataframe(active_rec_data)
+
+
+# In[18]:
+
+
+print(f'Actieve recepten lijst ingelezen: {active_rec_name} || Tabblad: {active_rec_sheet}')
+
+
+# ## User input ##
+# Get user input on what to do exactly.
+
+# ### Prices ###
+
+# In[19]:
+
+
+# price_period = input(f'In welke van de volgende kolommen staan de nieuwe prijzen?\n{[x for x in price_weight_data.columns]}')
+price_period = 'PRICE Q2'
+
+
+# ### Active recipes ###
+
+# In[20]:
+
+
+act_rec_period = '2025 Q2'
 
 
 # ### Data cleaning ###
@@ -215,7 +288,7 @@ print(f'Waste lijst ingelezen: {waste_name} || Tabblad: {waste_sheet_name}')
 
 # ##### Split data into recipes #####
 
-# In[190]:
+# In[21]:
 
 
 recipes = []
@@ -240,13 +313,26 @@ for i in range(len(bom_data_raw)):
                 break
 
 
+# ##### Drop inactive recipes #####
+
+# In[22]:
+
+
+recipes_temp = []
+for recipe in recipes:
+    if str(recipe.id) in np.array(active_rec_data[active_rec_data[act_rec_period] == 'Actief']['Artikel']).astype(str):
+        recipes_temp.append(recipe)
+
+recipes = recipes_temp
+
+
 # ### Product master ###
 # Create a product master based on the information in the BOM:
 # - If an item starts with '3' --> **packaging**, else
 # - If an item has a child --> **HF**, else
 # - Item --> **ingredient**
 
-# In[191]:
+# In[23]:
 
 
 product_master_dict = {}
@@ -274,22 +360,12 @@ product_master = pd.DataFrame.from_dict(product_master_dict, orient='index', col
 # ##### Split product data by categorie #####
 # Store the ids ('hf_nr') in NumPy arrays for easy and fast checking against later.
 
-# In[192]:
+# In[24]:
 
 
 product_data_ingredient = np.array(product_master[product_master['Categorie'] == 'Ingredient']['Nummer'])
 product_data_packaging = np.array(product_master[product_master['Categorie'] == 'Verpakking']['Nummer'])
 product_data_HF = np.array(product_master[product_master['Categorie'] == 'Halffabrikaat']['Nummer'])
-
-
-# ## User input ##
-# Get user input on what to do exactly.
-
-# In[193]:
-
-
-# price_period = input(f'In welke van de volgende kolommen staan de nieuwe prijzen?\n{[x for x in price_weight_data.columns]}')
-price_period = 'PRICE Q2'
 
 
 # ## Data validation ##
@@ -299,7 +375,7 @@ price_period = 'PRICE Q2'
 # 
 # Check if all ingredients have a new price.
 
-# In[ ]:
+# In[25]:
 
 
 ing_error_list = []
@@ -322,7 +398,7 @@ for ing in product_data_ingredient:
 
 # In case of no errors, force cast data type for price_period if it's not already correct.
 
-# In[195]:
+# In[26]:
 
 
 if (price_weight_data[price_period].dtype == 'O') and (len(ing_error_list) == 0):
@@ -332,7 +408,7 @@ if (price_weight_data[price_period].dtype == 'O') and (len(ing_error_list) == 0)
 # ### Waste ###
 # Check if all items at level 1 have waste percentages.
 
-# In[ ]:
+# In[27]:
 
 
 waste_error_list = []
@@ -364,7 +440,7 @@ for recipe in recipes:
 
 # In case of no errors, force cast data types for waste columns if they're not already correct.
 
-# In[199]:
+# In[28]:
 
 
 if (waste_data['WASTE-NAV'].dtype == 'O') and (len(waste_error_list) == 0):
@@ -380,7 +456,7 @@ if (waste_data['WASTE-USE'].dtype == 'O') and (len(waste_error_list) == 0):
 # ### Errors feedback ###
 # Give feedback to the user about data validation errors.
 
-# In[ ]:
+# In[29]:
 
 
 if (len(ing_error_list) == 0) and (len(waste_error_list)) == 0:
@@ -419,7 +495,7 @@ else:
 
 # ## Modeling ##
 
-# In[ ]:
+# In[30]:
 
 
 print('Starten met modeleren')
@@ -427,7 +503,7 @@ print('Starten met modeleren')
 
 # ### Add categories ###
 
-# In[196]:
+# In[31]:
 
 
 for recipe in recipes:
@@ -454,7 +530,7 @@ for recipe in recipes:
 # ### New prices ###
 # From price list for ingredients & gas; 0 for packaging; and empty for HFs.
 
-# In[197]:
+# In[32]:
 
 
 for recipe in recipes:
@@ -465,13 +541,17 @@ for recipe in recipes:
 
         if item_id in product_data_ingredient: # ingredients
             subset_price_df = price_weight_data[price_weight_data['INGREDIENT CODE'] == item_id]
-            new_price = subset_price_df['PRICE Q2'].iloc[0]
+            
+            if not len(subset_price_df) == 0:
+                new_price = subset_price_df['PRICE Q2'].iloc[0]
+            else:
+                new_price = 'Geen nieuwe prijs'
         
         elif item_id in product_data_packaging: # packaging
             new_price = 0
 
         elif item_id in product_data_HF: # HFs
-            new_price = None
+            new_price = np.nan
         
         else: # unclassified
             new_price = 'Geen nieuwe prijs'
@@ -484,7 +564,7 @@ for recipe in recipes:
 # ### Old prices ###
 # Old costs / old quantity for ingredients & gas; 0 for packaging; and empty for HFs.
 
-# In[208]:
+# In[33]:
 
 
 warnings.filterwarnings('ignore', category=RuntimeWarning)
@@ -515,7 +595,7 @@ for recipe in recipes:
 # ### Weight in kg ###
 # Convert items not in kg. Items already in kg stay the same. Packaging goes to 0, regardless of the unit.
 
-# In[199]:
+# In[34]:
 
 
 for recipe in recipes:
@@ -551,7 +631,7 @@ for recipe in recipes:
 # ### Waste ###
 # For items at level 1: find the waste in the waste data. For all other items, find the parent item at level 1, and take the waste from there.
 
-# In[200]:
+# In[35]:
 
 
 for recipe in recipes:
@@ -630,7 +710,7 @@ for recipe in recipes:
 # ### Quantities ###
 # Calculate the quantities based on the known waste data.
 
-# In[201]:
+# In[36]:
 
 
 for recipe in recipes:
@@ -665,7 +745,7 @@ for recipe in recipes:
 
 # #### Non-HF costs ####
 
-# In[202]:
+# In[37]:
 
 
 for recipe in recipes:
@@ -702,7 +782,7 @@ for recipe in recipes:
 # #### HF costs ####
 # For an HF the costs are determined based on the costs of the individual ingredients which make up the HF.
 
-# In[203]:
+# In[38]:
 
 
 for recipe in recipes:
@@ -748,7 +828,7 @@ for recipe in recipes:
 
 # ### Deltas ###
 
-# In[204]:
+# In[39]:
 
 
 for recipe in recipes:
@@ -761,14 +841,22 @@ for recipe in recipes:
 
         try:
             delta_q = (recipe.data['Aantal (nieuw)'][i] - recipe.data['Aantal (Basis)'][i]) * recipe.data['Oude prijs'][i]
-            delta_p = (recipe.data['Nieuwe prijs'][i] - recipe.data['Oude prijs'][i]) * recipe.data['Aantal (nieuw)'][i]
-            delta_cost = recipe.data['Materiaalkosten (nieuw)'][i] - recipe.data['Materiaalkosten'][i]
-            fin_waste_impact = recipe.data['Materiaalkosten (nieuw)'][i] - recipe.data['Nieuwe vvp'][i]
-
         except TypeError:
             delta_q = 'Kan niet berekenen'
+        
+        try:
+            delta_p = (recipe.data['Nieuwe prijs'][i] - recipe.data['Oude prijs'][i]) * recipe.data['Aantal (nieuw)'][i]
+        except TypeError as e:            
             delta_p = 'Kan niet berekenen'
+        
+        try:                  
+            delta_cost = recipe.data['Materiaalkosten (nieuw)'][i] - recipe.data['Materiaalkosten'][i]
+        except TypeError:
             delta_cost = 'Kan niet berekenen'
+        
+        try:
+            fin_waste_impact = recipe.data['Materiaalkosten (nieuw)'][i] - recipe.data['Nieuwe vvp'][i]
+        except TypeError:
             fin_waste_impact = 'Kan niet berekenen'
 
         delta_q_col.append(delta_q)
@@ -782,7 +870,7 @@ for recipe in recipes:
     recipe.data['Delta FIN waste'] = fin_waste_impact_col
 
 
-# In[ ]:
+# In[40]:
 
 
 print('Klaar met modeleren')
@@ -790,7 +878,7 @@ print('Klaar met modeleren')
 
 # ## Output Excel file ##
 
-# In[ ]:
+# In[41]:
 
 
 print('Output file maken')
@@ -798,7 +886,7 @@ print('Output file maken')
 
 # ### BOM ###
 
-# In[205]:
+# In[42]:
 
 
 frames = []
@@ -811,7 +899,7 @@ BOM_df = pd.concat(frames)
 # ### Excel file formatting ###
 # Change column order and names. Drop a few columns.
 
-# In[206]:
+# In[43]:
 
 
 # Reorder and drop columns
@@ -850,9 +938,15 @@ BOM_df = BOM_df.rename(columns={"index": "Index",
 
 # ### Save to Excel ###
 
-# In[208]:
+# In[44]:
 
 
-with pd.ExcelWriter("Output v7 - Q2.xlsx") as writer:
+with pd.ExcelWriter(f"Output v7 - {price_period[-2:]}.xlsx") as writer:
     BOM_df.to_excel(writer, sheet_name="BOM")
+
+
+# In[370]:
+
+
+input('Script is klaar! \n\n Je kan dit venster sluiten')
 
