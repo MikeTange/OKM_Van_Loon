@@ -1,20 +1,24 @@
-# %% [markdown]
+#!/usr/bin/env python
+# coding: utf-8
+
 # # OKM Model #
 
-# %% [markdown]
 # ## Set-up ##
 
-# %% [markdown]
 # ### Imports ###
 
-# %%
+# In[240]:
+
+
 import pandas as pd
 import numpy as np
 
-# %% [markdown]
+
 # ### Objects ###
 
-# %%
+# In[241]:
+
+
 class recipe:
     """ a recipe """
 
@@ -28,72 +32,166 @@ class recipe:
         """ set the string representation of a recipe """
         return f'{self.id} {self.name}'
 
-# %% [markdown]
+
+# ### Functions ###
+
+# In[ ]:
+
+
+def rename_nan_columns(df, prefix="col"):
+    """
+    Rename DataFrame columns whose header could not be inferred, and have 'NaN' as header
+
+    Parameters:
+    - df: pandas.DataFrame
+    - prefix: prefix to replace NaN column names with
+
+    Returns:
+    - DataFrame with renamed columns
+    """
+    df = df.copy()
+    df.columns = [
+        f"{prefix}{idx}" if pd.isna(col) else col.strip()
+        for idx, col in enumerate(df.columns)]
+    return df
+
+
+def clean_dataframe(df, replace_empty_with_na=True):
+    """
+    Cleans a DataFrame by:
+    - Stripping whitespace from string values
+    - Optionally replacing empty strings with pd.NA
+    - Converting column types using pandas' best-guess inference
+
+    Parameters:
+    - df: pandas.DataFrame
+    - replace_empty_with_na: bool, whether to treat empty strings as missing values
+
+    Returns:
+    - Cleaned and type-inferred DataFrame
+    """
+    df = df.copy()
+
+    # Strip whitespace from strings & replace commas with periods as floating points
+    df = df.map(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
+
+    # Optionally replace empty strings with pd.NA for better type inference
+    if replace_empty_with_na:
+        df.replace("", pd.NA, inplace=True)
+
+    # Infer column types
+    df = df.convert_dtypes()
+
+    return df
+
+
 # ## Data preparation ##
 
-# %% [markdown]
-# ### Data loading ###
+# ### Input parameters ###
 
-# %% [markdown]
+# In[242]:
+
+
+bom_name = "250416 Recepten download NAV 16-4.xlsx"
+bom_sheet_name = "Budget"
+price_weight_name = "Input Price List + Grammage.xlsx"
+price_weight_sheet_name = "PriceList"
+waste_name = "Input Waste Table.xlsx"
+waste_sheet_name = 'WASTE'
+
+
+# ### Data loading & initial validation ###
+
 # #### BOM ####
 # 
 
-# %%
-bom_data_raw = pd.read_excel("250416 Recepten download NAV 16-4.xlsx", skiprows=1, header=None, decimal=",")
+# In[243]:
 
-# %% [markdown]
+
+bom_data_raw = pd.read_excel(bom_name, sheet_name=bom_sheet_name, skiprows=1, header=None, decimal=",")
+
+
+# In[244]:
+
+
+print(f'BOM ingelezen: {bom_name} || Tabblad: {bom_sheet_name}')
+
+
 # #### Prices & weights ####
 
-# %%
-price_weight_data = pd.read_excel("Input Price List + Grammage.xlsx", sheet_name="PriceList", header=0).astype({'INGREDIENT CODE': 'string'})
+# In[ ]:
 
-# %% [markdown]
+
+price_weight_data_raw = pd.read_excel(price_weight_name, sheet_name=price_weight_sheet_name, header=None)
+
+# Drop leading empty rows
+price_weight_data_trimmed = price_weight_data_raw.loc[~price_weight_data_raw.isnull().all(axis=1)].reset_index(drop=True)
+
+# Promote the first non-empty row to header
+header = price_weight_data_trimmed.iloc[0]
+price_weight_data = price_weight_data_trimmed[1:]
+price_weight_data.columns = header
+price_weight_data = price_weight_data.reset_index(drop=True)
+
+# Rename any columns named: "NaN"
+price_weight_data = rename_nan_columns(price_weight_data)
+
+# Clean DataFrame values
+price_weight_data = clean_dataframe(price_weight_data).astype({"INGREDIENT CODE": 'string', "INGREDIENTS": 'string'}) # fix incorrect type inferences
+
+
+# In[222]:
+
+
+print(f'Prijs en gewicht lijst ingelezen: {price_weight_name} || Tabblad: {price_weight_sheet_name}')
+
+
 # #### Waste ####
 
-# %%
-waste_data = pd.read_excel("Input Waste Table.xlsx", sheet_name='WASTE', header=0).astype({'MEAL CODE': "string", 'INGREDIENT CODE': 'string'})
+# In[ ]:
 
-# %% [markdown]
+
+waste_data_raw = pd.read_excel(waste_name, sheet_name=waste_sheet_name, header=None)
+
+# Drop leading empty rows
+waste_data_trimmed = waste_data_raw.loc[~waste_data_raw.isnull().all(axis=1)].reset_index(drop=True)
+
+# Promote the first non-empty row to header
+header = waste_data_trimmed.iloc[0]
+waste_data = waste_data_trimmed[1:]
+waste_data.columns = header
+df = waste_data.reset_index(drop=True)
+
+# Rename any columns named: "NaN"
+waste_data = rename_nan_columns(waste_data)
+
+# Clean DataFrame values
+waste_data = clean_dataframe(waste_data).astype({'MEAL CODE': 'string', 'INGREDIENT CODE': 'string', 'UNITS': 'string', 'VOLUME': 'float64'}) # fix incorrect type inferences
+
+
 # ##### Add unique id column #####
 
-# %%
+# In[346]:
+
+
 waste_data['id'] = waste_data[['MEAL CODE', 'INGREDIENT CODE']].agg('_'.join, axis=1).astype('string')
 
-# %% [markdown]
-# #### Product master ####
 
-# %%
-product_data = pd.read_excel("Input Productmaster.xlsx", sheet_name='Product')
+# In[293]:
 
-# %% [markdown]
-# ##### Active recipes #####
 
-# %%
-active_rec_data = pd.read_excel("Input Productmaster.xlsx", sheet_name='Actief')
+print(f'Waste lijst ingelezen: {waste_name} || Tabblad: {waste_sheet_name}')
 
-# %%
-active_recipes = [str(x) for x in active_rec_data[active_rec_data['Actief'] == 'Ja']['Artikel']]
 
-# %% [markdown]
-# ##### Split product data by categorie #####
-# Store the ids ('hf_nr') in NumPy arrays for easy and fast checking against later.
-
-# %%
-product_data_ingredient = np.array(product_data[product_data['Categorie'] == 'Ingredient']['Nummer'])
-product_data_packaging = np.array(product_data[product_data['Categorie'] == 'Verpakking']['Nummer'])
-product_data_HF = np.array(product_data[product_data['Categorie'] == 'Halffabrikaat']['Nummer'])
-product_data_gas = np.array(product_data[product_data['Categorie'] == 'Gas']['Nummer'])
-
-# %% [markdown]
 # ### Data cleaning ###
 
-# %% [markdown]
 # #### BOM ####
 
-# %% [markdown]
 # ##### Split data into recipes #####
 
-# %%
+# In[192]:
+
+
 recipes = []
 
 for i in range(len(bom_data_raw)):
@@ -115,25 +213,71 @@ for i in range(len(bom_data_raw)):
                 i += j
                 break
 
-# %% [markdown]
-# ##### Drop inactive recipes #####
-# Keep this separate for now in case it has to be removed later.
 
-# %%
-recipes_temp = []
+# ### Product master creation ###
+# Create a product master based on the information in the BOM:
+# - If an item starts with '3' --> **packaging**, else
+# - If an item has a child --> **HF**, else
+# - Item --> **ingredient**
+
+# In[193]:
+
+
+product_master_dict = {}
+
 for recipe in recipes:
-    if str(recipe.id) in active_recipes:
-        recipes_temp.append(recipe)
+    for i in range(len(recipe.data)):
+        item_id = recipe.data['hf_nr'][i]
 
-recipes = recipes_temp
+        if not item_id in product_master_dict.keys():
+            if item_id.startswith('3'):
+                classification = 'Verpakking'
+            elif not i + 1 == len(recipe.data):
+                if recipe.data['Niveau'][i + 1] > recipe.data['Niveau'][i]:
+                    classification = 'Halffabrikaat'
+                else:
+                    classification = 'Ingredient'
+            else:
+                classification = 'Ingredient'
+        
+            product_master_dict[item_id] = [item_id, classification]
 
-# %% [markdown]
+product_master = pd.DataFrame.from_dict(product_master_dict, orient='index', columns=['Nummer', 'Categorie']).reset_index(drop=True)
+
+
+# ##### Split product data by categorie #####
+# Store the ids ('hf_nr') in NumPy arrays for easy and fast checking against later.
+
+# In[195]:
+
+
+product_data_ingredient = np.array(product_master[product_master['Categorie'] == 'Ingredient']['Nummer'])
+product_data_packaging = np.array(product_master[product_master['Categorie'] == 'Verpakking']['Nummer'])
+product_data_HF = np.array(product_master[product_master['Categorie'] == 'Halffabrikaat']['Nummer'])
+
+
+# ## Data validation ##
+# Validating the correctness of the input data.
+
+# ### Checking if all items classified as ingredients have a new price ###
+
+# In[ ]:
+
+
+for recipe in recipes:
+    for i in range(len(recipe.data)):
+        item_id = recipe.data['hf_nr'][i]
+
+        
+
+
 # ## Modeling ##
 
-# %% [markdown]
 # ### Add categories ###
 
-# %%
+# In[196]:
+
+
 for recipe in recipes:
     categories = []
 
@@ -149,26 +293,25 @@ for recipe in recipes:
         elif item_id in product_data_packaging:
             categories.append('Verpakking')
         
-        elif item_id in product_data_gas:
-            categories.append('Gas')
-        
         else:
             categories.append('Ongeclassificeerd')
     
     recipe.data['Categorie'] = categories
 
-# %% [markdown]
+
 # ### New prices ###
 # From price list for ingredients & gas; 0 for packaging; and empty for HFs.
 
-# %%
+# In[197]:
+
+
 for recipe in recipes:
     new_prices = []
 
     for i in range(len(recipe.data)):
         item_id = recipe.data['hf_nr'][i]
 
-        if (item_id in product_data_ingredient) or (item_id in product_data_gas): # ingredients & gas
+        if item_id in product_data_ingredient: # ingredients
             subset_price_df = price_weight_data[price_weight_data['INGREDIENT CODE'] == item_id]
             new_price = subset_price_df['PRICE Q2'].iloc[0]
         
@@ -185,18 +328,20 @@ for recipe in recipes:
         
     recipe.data['Nieuwe prijs'] = new_prices
 
-# %% [markdown]
+
 # ### Old prices ###
 # Old costs / old quantity for ingredients & gas; 0 for packaging; and empty for HFs.
 
-# %%
+# In[198]:
+
+
 for recipe in recipes:
     old_prices = []
 
     for i in range(len(recipe.data)):
         item_id = recipe.data['hf_nr'][i]
 
-        if (item_id in product_data_ingredient) or (item_id in product_data_gas): # ingredients & gas
+        if item_id in product_data_ingredient: # ingredients
             old_price = recipe.data['Materiaalkosten'][i] / recipe.data['Aantal (Basis)'][i]
         
         elif item_id in product_data_packaging: # packaging
@@ -212,11 +357,13 @@ for recipe in recipes:
         
     recipe.data['Oude prijs'] = old_prices
 
-# %% [markdown]
+
 # ### Weight in kg ###
 # Convert items not in kg. Items already in kg stay the same. Packaging goes to 0, regardless of the unit.
 
-# %%
+# In[199]:
+
+
 for recipe in recipes:
     weights = []
 
@@ -246,11 +393,13 @@ for recipe in recipes:
 
     recipe.data['Grammage'] = weights
 
-# %% [markdown]
+
 # ### Waste ###
 # For items at level 1: find the waste in the waste data. For all other items, find the parent item at level 1, and take the waste from there.
 
-# %%
+# In[200]:
+
+
 for recipe in recipes:
     waste_nav_col = []
     waste_fin_col = []
@@ -323,11 +472,13 @@ for recipe in recipes:
     recipe.data['Waste FIN'] = waste_fin_col
     recipe.data['Waste USE'] = waste_use_col
 
-# %% [markdown]
+
 # ### Quantities ###
 # Calculate the quantities based on the known waste data.
 
-# %%
+# In[201]:
+
+
 for recipe in recipes:
     q_no_waste_col = []
     q_new_col = []
@@ -350,7 +501,7 @@ for recipe in recipes:
     recipe.data['Aantal (zonder waste)'] = q_no_waste_col
     recipe.data['Aantal (nieuw)'] = q_new_col
 
-# %% [markdown]
+
 # ### Costs ###
 # Several costs are calculated: 
 # - new p * old q ("vvp")
@@ -358,10 +509,11 @@ for recipe in recipes:
 # 
 # Costs are first calculated for the non-HF items, based on row-level info. Afterwards the HF item costs are calculated and inserted based on hierarchical info.
 
-# %% [markdown]
 # #### Non-HF costs ####
 
-# %%
+# In[202]:
+
+
 for recipe in recipes:
     newp_oldq_col = []
     newp_newq_col = []
@@ -369,7 +521,7 @@ for recipe in recipes:
     for i in range(len(recipe.data)):
         item_id = recipe.data['hf_nr'][i]
 
-        if (item_id in product_data_ingredient) or (item_id in product_data_packaging) or (item_id in product_data_gas):
+        if (item_id in product_data_ingredient) or (item_id in product_data_packaging):
             try:
                 newp_oldq = recipe.data['Nieuwe prijs'][i] * recipe.data['Aantal (Basis)'][i]
                 newp_newq = recipe.data['Nieuwe prijs'][i] * recipe.data['Aantal (nieuw)'][i]
@@ -392,11 +544,13 @@ for recipe in recipes:
     recipe.data['Nieuwe vvp'] = newp_oldq_col
     recipe.data['Materiaalkosten (nieuw)'] = newp_newq_col
 
-# %% [markdown]
+
 # #### HF costs ####
 # For an HF the costs are determined based on the costs of the individual ingredients which make up the HF.
 
-# %%
+# In[203]:
+
+
 for recipe in recipes:
     for i in range(len(recipe.data)):
         item_id = recipe.data['hf_nr'][i]
@@ -437,10 +591,12 @@ for recipe in recipes:
             recipe.data.at[i, 'Materiaalkosten (nieuw)'] = hf_newp_newq
             recipe.data.at[i, 'Materiaalkosten HF (berekend)'] = hf_oldp_oldq
 
-# %% [markdown]
+
 # ### Deltas ###
 
-# %%
+# In[204]:
+
+
 for recipe in recipes:
     delta_q_col = []
     delta_p_col = []
@@ -471,24 +627,27 @@ for recipe in recipes:
     recipe.data['Delta materiaalkosten'] = delta_cost_col
     recipe.data['Delta FIN waste'] = fin_waste_impact_col
 
-# %% [markdown]
+
 # ## Output Excel file ##
 
-# %% [markdown]
 # ### BOM ###
 
-# %%
+# In[205]:
+
+
 frames = []
 for recipe in recipes:
     frames.append(recipe.data)
 
 BOM_df = pd.concat(frames)
 
-# %% [markdown]
+
 # ### Excel file formatting ###
 # Change column order and names. Drop a few columns.
 
-# %%
+# In[206]:
+
+
 # Reorder and drop columns
 BOM_df = BOM_df[['index', 'id_nr', 'Product Naam', 'nr', 'Niveau', 'hf_nr', 'Omschrijving', 'Aantal (Basis)', 'Basiseenheid', 'Materiaalkosten', 'Categorie', 'Nieuwe prijs', 'Oude prijs',
                  'Nieuwe vvp', 'Waste NAV', 'Waste FIN', 'Waste USE', 'Aantal (zonder waste)', 'Aantal (nieuw)', 'Materiaalkosten (nieuw)', 'Delta materiaalkosten', 'Delta Q', 
@@ -522,11 +681,12 @@ BOM_df = BOM_df.rename(columns={"index": "Index",
                                 'Grammage': 'Gewicht (kg)'
                                 })
 
-# %% [markdown]
+
 # ### Save to Excel ###
 
-# %%
-with pd.ExcelWriter("Output v6 - Q2.xlsx") as writer:
-    BOM_df.to_excel(writer, sheet_name="BOM")
+# In[208]:
 
+
+with pd.ExcelWriter("Output v7 - Q2.xlsx") as writer:
+    BOM_df.to_excel(writer, sheet_name="BOM")
 
