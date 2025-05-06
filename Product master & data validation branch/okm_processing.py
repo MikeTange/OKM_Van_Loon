@@ -8,7 +8,11 @@
 # ### Imports ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[3]:
+=======
+# In[371]:
+>>>>>>> Stashed changes
 =======
 # In[371]:
 >>>>>>> Stashed changes
@@ -23,7 +27,11 @@ import openpyxl
 # ### Objects ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[4]:
+=======
+# In[372]:
+>>>>>>> Stashed changes
 =======
 # In[372]:
 >>>>>>> Stashed changes
@@ -46,7 +54,11 @@ class recipe:
 # ### Functions ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[5]:
+=======
+# In[373]:
+>>>>>>> Stashed changes
 =======
 # In[373]:
 >>>>>>> Stashed changes
@@ -104,7 +116,11 @@ def clean_dataframe(df, replace_empty_with_na=True):
 # ### Input parameters ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[6]:
+=======
+# In[374]:
+>>>>>>> Stashed changes
 =======
 # In[374]:
 >>>>>>> Stashed changes
@@ -131,7 +147,11 @@ active_rec_sheet = "Actief"
 # Price and weight data
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[7]:
+=======
+# In[375]:
+>>>>>>> Stashed changes
 =======
 # In[375]:
 >>>>>>> Stashed changes
@@ -143,7 +163,11 @@ req_cols_price_weight = ['INGREDIENT CODE', 'INGREDIENTS', 'KG']
 # Waste data
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[8]:
+=======
+# In[376]:
+>>>>>>> Stashed changes
 =======
 # In[376]:
 >>>>>>> Stashed changes
@@ -166,7 +190,11 @@ req_cols_act_rec = ['Artikel']
 # 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[10]:
+=======
+# In[377]:
+>>>>>>> Stashed changes
 =======
 # In[377]:
 >>>>>>> Stashed changes
@@ -176,7 +204,11 @@ bom_data_raw = pd.read_excel(bom_name, sheet_name=bom_sheet_name, skiprows=1, he
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[11]:
+=======
+# In[378]:
+>>>>>>> Stashed changes
 =======
 # In[378]:
 >>>>>>> Stashed changes
@@ -188,7 +220,11 @@ print(f'BOM ingelezen: {bom_name} || Tabblad: {bom_sheet_name}')
 # #### Prices & weights ####
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[12]:
+=======
+# In[379]:
+>>>>>>> Stashed changes
 =======
 # In[379]:
 >>>>>>> Stashed changes
@@ -217,7 +253,11 @@ price_weight_data = clean_dataframe(price_weight_data).astype({"INGREDIENT CODE"
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[13]:
+=======
+# In[380]:
+>>>>>>> Stashed changes
 =======
 # In[380]:
 >>>>>>> Stashed changes
@@ -229,7 +269,11 @@ print(f'Prijs en gewicht lijst ingelezen: {price_weight_name} || Tabblad: {price
 # #### Waste ####
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[14]:
+=======
+# In[381]:
+>>>>>>> Stashed changes
 =======
 # In[381]:
 >>>>>>> Stashed changes
@@ -260,7 +304,11 @@ waste_data = clean_dataframe(waste_data).astype({'MEAL CODE': 'string', 'INGREDI
 # ##### Add unique id column #####
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[15]:
+=======
+# In[382]:
+>>>>>>> Stashed changes
 =======
 # In[382]:
 >>>>>>> Stashed changes
@@ -270,7 +318,11 @@ waste_data['id'] = waste_data[['MEAL CODE', 'INGREDIENT CODE']].agg('_'.join, ax
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[16]:
+=======
+# In[383]:
+>>>>>>> Stashed changes
 =======
 # In[383]:
 >>>>>>> Stashed changes
@@ -341,7 +393,11 @@ act_rec_period = '2025 Q2'
 # ##### Split data into recipes #####
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[21]:
+=======
+# In[384]:
+>>>>>>> Stashed changes
 =======
 # In[384]:
 >>>>>>> Stashed changes
@@ -389,7 +445,11 @@ recipes = recipes_temp
 # - Item --> **ingredient**
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[23]:
+=======
+# In[385]:
+>>>>>>> Stashed changes
 =======
 # In[385]:
 >>>>>>> Stashed changes
@@ -421,7 +481,11 @@ product_master = pd.DataFrame.from_dict(product_master_dict, orient='index', col
 # Store the ids ('hf_nr') in NumPy arrays for easy and fast checking against later.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[24]:
+=======
+# In[386]:
+>>>>>>> Stashed changes
 =======
 # In[386]:
 >>>>>>> Stashed changes
@@ -453,7 +517,11 @@ price_period = 'PRICE Q2'
 # Check if all ingredients have a new price.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[25]:
+=======
+# In[388]:
+>>>>>>> Stashed changes
 =======
 # In[388]:
 >>>>>>> Stashed changes
@@ -480,7 +548,11 @@ for ing in product_data_ingredient:
 # In case of no errors, force cast data type for price_period if it's not already correct.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[26]:
+=======
+# In[389]:
+>>>>>>> Stashed changes
 =======
 # In[389]:
 >>>>>>> Stashed changes
@@ -494,7 +566,11 @@ if (price_weight_data[price_period].dtype == 'O') and (len(ing_error_list) == 0)
 # Check if all items at level 1 have waste percentages.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[27]:
+=======
+# In[390]:
+>>>>>>> Stashed changes
 =======
 # In[390]:
 >>>>>>> Stashed changes
@@ -530,7 +606,11 @@ for recipe in recipes:
 # In case of no errors, force cast data types for waste columns if they're not already correct.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[28]:
+=======
+# In[391]:
+>>>>>>> Stashed changes
 =======
 # In[391]:
 >>>>>>> Stashed changes
@@ -550,7 +630,11 @@ if (waste_data['WASTE-USE'].dtype == 'O') and (len(waste_error_list) == 0):
 # Give feedback to the user about data validation errors.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[29]:
+=======
+# In[392]:
+>>>>>>> Stashed changes
 =======
 # In[392]:
 >>>>>>> Stashed changes
@@ -593,7 +677,11 @@ else:
 # ## Modeling ##
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[30]:
+=======
+# In[393]:
+>>>>>>> Stashed changes
 =======
 # In[393]:
 >>>>>>> Stashed changes
@@ -605,7 +693,11 @@ print('Starten met modeleren')
 # ### Add categories ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[31]:
+=======
+# In[394]:
+>>>>>>> Stashed changes
 =======
 # In[394]:
 >>>>>>> Stashed changes
@@ -636,7 +728,11 @@ for recipe in recipes:
 # From price list for ingredients & gas; 0 for packaging; and empty for HFs.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[32]:
+=======
+# In[395]:
+>>>>>>> Stashed changes
 =======
 # In[395]:
 >>>>>>> Stashed changes
@@ -674,7 +770,11 @@ for recipe in recipes:
 # Old costs / old quantity for ingredients & gas; 0 for packaging; and empty for HFs.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[33]:
+=======
+# In[396]:
+>>>>>>> Stashed changes
 =======
 # In[396]:
 >>>>>>> Stashed changes
@@ -709,7 +809,11 @@ for recipe in recipes:
 # Convert items not in kg. Items already in kg stay the same. Packaging goes to 0, regardless of the unit.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[34]:
+=======
+# In[397]:
+>>>>>>> Stashed changes
 =======
 # In[397]:
 >>>>>>> Stashed changes
@@ -749,7 +853,11 @@ for recipe in recipes:
 # For items at level 1: find the waste in the waste data. For all other items, find the parent item at level 1, and take the waste from there.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[35]:
+=======
+# In[398]:
+>>>>>>> Stashed changes
 =======
 # In[398]:
 >>>>>>> Stashed changes
@@ -832,7 +940,11 @@ for recipe in recipes:
 # Calculate the quantities based on the known waste data.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[36]:
+=======
+# In[399]:
+>>>>>>> Stashed changes
 =======
 # In[399]:
 >>>>>>> Stashed changes
@@ -871,7 +983,11 @@ for recipe in recipes:
 # #### Non-HF costs ####
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[37]:
+=======
+# In[400]:
+>>>>>>> Stashed changes
 =======
 # In[400]:
 >>>>>>> Stashed changes
@@ -912,7 +1028,11 @@ for recipe in recipes:
 # For an HF the costs are determined based on the costs of the individual ingredients which make up the HF.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[38]:
+=======
+# In[401]:
+>>>>>>> Stashed changes
 =======
 # In[401]:
 >>>>>>> Stashed changes
@@ -962,7 +1082,11 @@ for recipe in recipes:
 # ### Deltas ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[39]:
+=======
+# In[402]:
+>>>>>>> Stashed changes
 =======
 # In[402]:
 >>>>>>> Stashed changes
@@ -1008,7 +1132,11 @@ for recipe in recipes:
 
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[40]:
+=======
+# In[403]:
+>>>>>>> Stashed changes
 =======
 # In[403]:
 >>>>>>> Stashed changes
@@ -1020,7 +1148,11 @@ print('Klaar met modeleren')
 # ## Output Excel file ##
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[41]:
+=======
+# In[404]:
+>>>>>>> Stashed changes
 =======
 # In[404]:
 >>>>>>> Stashed changes
@@ -1032,7 +1164,11 @@ print('Output file maken')
 # ### BOM ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[42]:
+=======
+# In[405]:
+>>>>>>> Stashed changes
 =======
 # In[405]:
 >>>>>>> Stashed changes
@@ -1049,7 +1185,11 @@ BOM_df = pd.concat(frames)
 # Change column order and names. Drop a few columns.
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[43]:
+=======
+# In[406]:
+>>>>>>> Stashed changes
 =======
 # In[406]:
 >>>>>>> Stashed changes
@@ -1092,7 +1232,11 @@ BOM_df = BOM_df.rename(columns={"index": "Index",
 # ### Save to Excel ###
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 # In[44]:
+=======
+# In[407]:
+>>>>>>> Stashed changes
 =======
 # In[407]:
 >>>>>>> Stashed changes

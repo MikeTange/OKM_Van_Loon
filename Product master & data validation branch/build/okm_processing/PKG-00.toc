@@ -41,6 +41,7 @@
    'PYMODULE'),
   ('pyiboot01_bootstrap',
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
    'PYSOURCE'),
   ('pyi_rth_inspect',
@@ -64,6 +65,8 @@
   ('pyi_rth__tkinter',
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\Lib\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth__tkinter.py',
 =======
+=======
+>>>>>>> Stashed changes
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
    'PYSOURCE'),
   ('pyi_rth_inspect',
@@ -86,12 +89,16 @@
    'PYSOURCE'),
   ('pyi_rth__tkinter',
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth__tkinter.py',
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
    'PYSOURCE'),
   ('okm_processing',
    'C:\\Users\\michi\\Documents\\GitHub\\Sparke & Keane\\OKM_Van_Loon\\Product '
    'master & data validation branch\\okm_processing.py',
    'PYSOURCE'),
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
   ('python310.dll',
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\python310.dll',
@@ -10687,6 +10694,8 @@
   ('wheel-0.45.1.dist-info\\WHEEL',
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\wheel-0.45.1.dist-info\\WHEEL',
 =======
+=======
+>>>>>>> Stashed changes
   ('python312.dll',
    'C:\\ProgramData\\anaconda3\\envs\\okm_van_loon\\python312.dll',
    'BINARY'),
@@ -21439,6 +21448,9 @@
    'DATA'),
   ('nbformat-5.10.4.dist-info\\WHEEL',
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\nbformat-5.10.4.dist-info\\WHEEL',
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
    'DATA'),
   ('base_library.zip',
@@ -21446,7 +21458,11 @@
    'master & data validation branch\\build\\okm_processing\\base_library.zip',
    'DATA')],
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
  'python310.dll',
+=======
+ 'python312.dll',
+>>>>>>> Stashed changes
 =======
  'python312.dll',
 >>>>>>> Stashed changes
