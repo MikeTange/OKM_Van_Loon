@@ -9,6 +9,13 @@
   ('C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks',
    -1000),
   ('C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\_pyinstaller_hooks_contrib',
+=======
+ [('C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\numpy\\_pyinstaller',
+   0),
+  ('C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\_pyinstaller_hooks_contrib\\stdhooks',
+   -1000),
+  ('C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\_pyinstaller_hooks_contrib',
+>>>>>>> Stashed changes
    -1000)],
  {},
  [],
