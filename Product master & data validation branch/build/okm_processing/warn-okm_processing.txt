@@ -16,6 +16,7 @@ IMPORTANT: Do NOT post this list to the issue-tracker. Use it as a basis for
 
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 missing module named pep517 - imported by importlib.metadata (delayed)
 missing module named 'org.python' - imported by copy (optional), xml.sax (delayed, conditional)
 missing module named pwd - imported by posixpath (delayed, conditional), subprocess (delayed, conditional, optional), shutil (delayed, optional), tarfile (optional), pathlib (delayed, optional), http.server (delayed, optional), webbrowser (delayed), netrc (delayed, conditional), getpass (delayed), psutil (optional), distutils.util (delayed, conditional, optional), distutils.archive_util (optional), setuptools._vendor.backports.tarfile (optional), setuptools._distutils.util (delayed, conditional, optional), setuptools._distutils.archive_util (optional)
@@ -35,6 +36,8 @@ missing module named 'distutils._modified' - imported by setuptools._distutils.f
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 missing module named urllib.urlopen - imported by urllib (delayed, optional), lxml.html (delayed, optional)
 missing module named urllib.urlencode - imported by urllib (delayed, optional), lxml.html (delayed, optional)
 missing module named pwd - imported by posixpath (delayed, conditional, optional), subprocess (delayed, conditional, optional), shutil (delayed, optional), tarfile (optional), pathlib (delayed, optional), http.server (delayed, optional), netrc (delayed, conditional), getpass (delayed), psutil (optional), setuptools._distutils.util (delayed, conditional, optional), setuptools._distutils.archive_util (optional), setuptools._vendor.backports.tarfile (optional)
@@ -46,6 +49,9 @@ excluded module named _frozen_importlib - imported by importlib (optional), impo
 missing module named _posixsubprocess - imported by subprocess (conditional), multiprocessing.util (delayed)
 missing module named fcntl - imported by subprocess (optional), xmlrpc.server (optional)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -54,6 +60,7 @@ missing module named multiprocessing.set_start_method - imported by multiprocess
 missing module named multiprocessing.get_start_method - imported by multiprocessing (top-level), multiprocessing.spawn (top-level)
 missing module named multiprocessing.get_context - imported by multiprocessing (top-level), multiprocessing.pool (top-level), multiprocessing.managers (top-level), multiprocessing.sharedctypes (top-level)
 missing module named multiprocessing.TimeoutError - imported by multiprocessing (top-level), multiprocessing.pool (top-level)
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 missing module named _scproxy - imported by urllib.request (conditional)
@@ -66,10 +73,15 @@ missing module named _scproxy - imported by urllib.request (conditional)
 missing module named termios - imported by tty (top-level), getpass (optional), IPython.core.page (delayed, optional), prompt_toolkit.input.vt100 (top-level)
 missing module named _scproxy - imported by urllib.request (conditional)
 >>>>>>> Stashed changes
+=======
+missing module named termios - imported by tty (top-level), getpass (optional), IPython.core.page (delayed, optional), prompt_toolkit.input.vt100 (top-level)
+missing module named _scproxy - imported by urllib.request (conditional)
+>>>>>>> Stashed changes
 missing module named multiprocessing.BufferTooShort - imported by multiprocessing (top-level), multiprocessing.connection (top-level)
 missing module named multiprocessing.AuthenticationError - imported by multiprocessing (top-level), multiprocessing.connection (top-level)
 missing module named multiprocessing.Process - imported by multiprocessing (top-level), jupyter_client.ssh.tunnel (top-level)
 missing module named asyncio.DefaultEventLoopPolicy - imported by asyncio (delayed, conditional), asyncio.events (delayed, conditional)
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 missing module named '_typeshed.importlib' - imported by pkg_resources (conditional)
@@ -97,6 +109,8 @@ missing module named lxml - imported by openpyxl.xml (delayed, optional), pandas
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 missing module named vms_lib - imported by platform (delayed, optional)
 missing module named 'java.lang' - imported by platform (delayed, optional)
 missing module named java - imported by platform (delayed)
@@ -115,6 +129,9 @@ missing module named trove_classifiers - imported by setuptools.config._validate
 missing module named pyimod02_importers - imported by C:\Users\michi\AppData\Roaming\Python\Python312\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgutil.py (delayed), C:\Users\michi\AppData\Roaming\Python\Python312\site-packages\PyInstaller\hooks\rthooks\pyi_rth_pkgres.py (delayed)
 missing module named collections.Mapping - imported by collections (optional), pytz.lazy (optional), parso.python.tree (optional)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -125,8 +142,11 @@ missing module named 'numpy_distutils.command' - imported by numpy.f2py.diagnose
 missing module named numpy_distutils - imported by numpy.f2py.diagnose (delayed, optional)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 missing module named charset_normalizer - imported by numpy.f2py.crackfortran (optional)
 missing module named dummy_threading - imported by psutil._compat (optional)
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -327,6 +347,7 @@ missing module named 'scipy.stats' - imported by pandas.core.nanops (delayed, co
 missing module named scipy - imported by pandas.core.dtypes.common (delayed, conditional, optional), pandas.core.missing (delayed)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 missing module named 'matplotlib.figure' - imported by matplotlib_inline.backend_inline (top-level), pandas.plotting._misc (conditional)
 missing module named 'matplotlib._pylab_helpers' - imported by matplotlib_inline.backend_inline (top-level)
 missing module named 'matplotlib.backends' - imported by matplotlib_inline.backend_inline (top-level)
@@ -339,6 +360,8 @@ missing module named chardet - imported by pygments.lexer (delayed, conditional,
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 missing module named pygments.formatters.LatexFormatter - imported by pygments.formatters (delayed), IPython.lib.display (delayed)
 missing module named pygments.formatters.HtmlFormatter - imported by pygments.formatters (delayed), IPython.lib.display (delayed), IPython.core.oinspect (top-level), stack_data.core (delayed)
 missing module named pygments.lexers.PrologLexer - imported by pygments.lexers (top-level), pygments.lexers.cplint (top-level)
@@ -346,6 +369,9 @@ missing module named PIL - imported by matplotlib_inline.config (delayed, option
 missing module named ctags - imported by pygments.formatters.html (optional)
 missing module named chardet - imported by pygments.lexer (delayed, conditional, optional), requests (optional), bs4.dammit (optional)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -357,6 +383,10 @@ missing module named 'jupyter_ai.completions' - imported by IPython.terminal.sho
 missing module named jupyter_ai - imported by IPython.terminal.shortcuts.auto_suggest (delayed, optional)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+=======
+missing module named jupyter_ai_magics - imported by IPython.terminal.shortcuts.auto_suggest (delayed, optional)
+>>>>>>> Stashed changes
 =======
 missing module named jupyter_ai_magics - imported by IPython.terminal.shortcuts.auto_suggest (delayed, optional)
 >>>>>>> Stashed changes
@@ -375,10 +405,13 @@ missing module named numpydoc - imported by jedi.inference.docstrings (delayed)
 missing module named sip - imported by IPython.external.qt_loaders (delayed, optional)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 missing module named nbformat - imported by IPython.core.magics.basic (delayed), IPython.core.interactiveshell (delayed, conditional)
 missing module named traitlets.config.Application - imported by traitlets.config (delayed, conditional), traitlets.log (delayed, conditional), ipykernel.kernelspec (top-level)
 missing module named argcomplete - imported by traitlets.config.loader (delayed, optional), traitlets.config.argcomplete_config (optional)
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 missing module named rpds.HashTrieMap - imported by rpds (top-level), referencing._core (top-level), jsonschema._types (top-level), jsonschema.validators (top-level)
@@ -415,6 +448,9 @@ missing module named sqlite3.OperationalError - imported by sqlite3 (optional), 
 missing module named sqlite3.DatabaseError - imported by sqlite3 (optional), IPython.core.history (optional)
 missing module named 'IPython.config' - imported by IPython.core.history (conditional)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -429,6 +465,7 @@ missing module named 'astroid.node_classes' - imported by asttokens.astroid_comp
 missing module named 'astroid.nodes' - imported by asttokens.astroid_compat (optional)
 missing module named astroid - imported by asttokens.astroid_compat (optional), asttokens.util (optional)
 missing module named _curses - imported by curses (top-level), curses.has_key (top-level)
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
 missing module named apport_python_hook - imported by exceptiongroup._formatting (conditional)
@@ -464,6 +501,8 @@ missing module named paramiko - imported by jupyter_client.ssh.tunnel (optional)
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
 missing module named 'matplotlib.figure' - imported by matplotlib_inline.backend_inline (top-level), pandas.plotting._misc (conditional)
 missing module named 'matplotlib._pylab_helpers' - imported by matplotlib_inline.backend_inline (top-level)
 missing module named 'matplotlib.backends' - imported by matplotlib_inline.backend_inline (top-level)
@@ -475,6 +514,9 @@ missing module named netifaces - imported by jupyter_client.localinterfaces (del
 missing module named 'cython.cimports' - imported by zmq.backend.cython._zmq (top-level)
 missing module named cython - imported by zmq.backend.cython._zmq (top-level)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -496,9 +538,12 @@ missing module named zmq.zmq_version_info - imported by zmq (delayed, conditiona
 missing module named zmq.zmq_version - imported by zmq (delayed, conditional), zmq.error (delayed, conditional)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 missing module named zmq.libzmq - imported by zmq (delayed, optional)
 missing module named xlsxwriter - imported by pandas.io.excel._xlsxwriter (delayed)
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 missing module named _subprocess - imported by jupyter_client.launcher (delayed, conditional, optional), ipykernel.parentpoller (delayed, optional)
@@ -539,6 +584,9 @@ missing module named urllib2 - imported by lxml.ElementInclude (optional), lxml.
 missing module named cssselect - imported by lxml.cssselect (optional)
 missing module named openpyxl.tests - imported by openpyxl.reader.excel (optional)
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -558,7 +606,10 @@ missing module named 'matplotlib.pyplot' - imported by pandas.io.formats.style (
 missing module named 'matplotlib.colors' - imported by pandas.plotting._misc (conditional), pandas.io.formats.style (conditional)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 missing module named markupsafe - imported by pandas.io.formats.style_render (top-level)
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======
@@ -584,8 +635,11 @@ missing module named 'pyarrow.parquet' - imported by pandas.io.parquet (delayed)
 missing module named google - imported by pandas.io.gbq (conditional)
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 missing module named 'lxml.html' - imported by pandas.io.html (delayed)
 missing module named bs4 - imported by pandas.io.html (delayed)
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
 =======

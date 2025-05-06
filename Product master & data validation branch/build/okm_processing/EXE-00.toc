@@ -5,7 +5,11 @@
  False,
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
  'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\PyInstaller\\bootloader\\images\\icon-console.ico',
+=======
+ 'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\PyInstaller\\bootloader\\images\\icon-console.ico',
+>>>>>>> Stashed changes
 =======
  'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\PyInstaller\\bootloader\\images\\icon-console.ico',
 >>>>>>> Stashed changes
@@ -73,6 +77,7 @@
   ('pyiboot01_bootstrap',
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
    'PYSOURCE'),
   ('pyi_rth_inspect',
@@ -98,6 +103,8 @@
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\PyInstaller\\loader\\pyiboot01_bootstrap.py',
    'PYSOURCE'),
   ('pyi_rth_inspect',
@@ -121,6 +128,9 @@
   ('pyi_rth__tkinter',
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\PyInstaller\\hooks\\rthooks\\pyi_rth__tkinter.py',
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -129,6 +139,7 @@
    'C:\\Users\\michi\\Documents\\GitHub\\Sparke & Keane\\OKM_Van_Loon\\Product '
    'master & data validation branch\\okm_processing.py',
    'PYSOURCE'),
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
   ('python310.dll',
@@ -10725,6 +10736,8 @@
   ('wheel-0.45.1.dist-info\\WHEEL',
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\wheel-0.45.1.dist-info\\WHEEL',
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   ('python312.dll',
@@ -21480,6 +21493,9 @@
   ('nbformat-5.10.4.dist-info\\WHEEL',
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\nbformat-5.10.4.dist-info\\WHEEL',
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
@@ -21493,6 +21509,7 @@
  False,
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
  1745845135,
  [('run.exe',
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
@@ -21501,12 +21518,17 @@
 =======
 =======
 >>>>>>> Stashed changes
+=======
+>>>>>>> Stashed changes
  1745506963,
  [('run.exe',
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\PyInstaller\\bootloader\\Windows-64bit-intel\\run.exe',
    'EXECUTABLE')],
  'C:\\ProgramData\\anaconda3\\envs\\okm_van_loon\\python312.dll')
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes

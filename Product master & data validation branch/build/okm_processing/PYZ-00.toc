@@ -3,6 +3,7 @@
  [('IPython',
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\IPython\\__init__.py',
    'PYMODULE'),
   ('IPython.core',
@@ -6009,6 +6010,8 @@
   ('zmq.utils.jsonapi',
    'C:\\Users\\michi\\.conda\\envs\\van_loon_okm\\lib\\site-packages\\zmq\\utils\\jsonapi.py',
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\IPython\\__init__.py',
@@ -12587,6 +12590,9 @@
   ('zmq.utils.jsonapi',
    'C:\\Users\\michi\\AppData\\Roaming\\Python\\Python312\\site-packages\\zmq\\utils\\jsonapi.py',
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
