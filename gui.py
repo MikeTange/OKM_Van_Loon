@@ -1,5 +1,7 @@
 from tkinter import filedialog, messagebox, ttk
 from data_preparation import *
+from save_output import *
+from processing import *
 import tkinter as tk
 import warnings
 import os
@@ -19,8 +21,14 @@ class OKM_processing:
                             'Actieve lijst': None}
         
         # Variable to store selected columns
-        self.selected_column = {'Prijs kolom': None,
-                                'Actieve kolom': None}
+        self.selected_columns = {'Prijs kolom': None, 
+                                 'Actieve kolom': None}
+
+        # Variables to store datasets
+        self.bom_data_raw = None
+        self.price_weight_data = None
+        self.waste_data = None
+        self.active_rec_data = None
 
         # Variables for dropdowns
         self.column_options = [[], []]
@@ -39,7 +47,7 @@ class OKM_processing:
 
         i = 0
         for key in self.input_files.keys():
-            btn = tk.Button(file_frame, text=f"Select Input File {key}", command=lambda idx=i: self.select_input_file(key=key, index=idx))
+            btn = tk.Button(file_frame, text=f"Select Input File {key}", command=lambda idx=i, key=key: self.select_input_file(key=key, index=idx))
             btn.grid(row=i, column=0, padx=5, pady=5, sticky="ew")
             label = tk.Label(file_frame, text="No file selected", anchor="w")
             label.grid(row=i, column=1, padx=5, pady=5, sticky="w")
@@ -55,13 +63,16 @@ class OKM_processing:
         self.column_frame.pack(padx=10, pady=10, fill="x")
 
         self.column_labels = []
-        for i in range(2):
-            label = tk.Label(self.column_frame, text=f"Select column for File {i+1}")
+
+        i = 0 
+        for key in self.selected_columns.keys():
+            label = tk.Label(self.column_frame, text=f"Select {key}")
             label.grid(row=i, column=0, padx=5, pady=5, sticky="w")
             dropdown = ttk.Combobox(self.column_frame, state="disabled")
             dropdown.grid(row=i, column=1, padx=5, pady=5, sticky="ew")
             self.column_labels.append(label)
             self.column_dropdowns[i] = dropdown
+            i += 1
 
         # Run Full Processing Button
         self.process_button = tk.Button(self.root, text="Run Full Processing", command=self.run_full_processing, state="disabled")
@@ -84,7 +95,6 @@ class OKM_processing:
 
     
     def run_initial_validation(self):
-        print(f'input file paths: {self.input_files.values()}')
         if not len([x for x in self.input_files.values() if x != None]) == 4:
             messagebox.showwarning("Missing File", "Please select all 4 input files before running validation.")
             return
@@ -94,18 +104,14 @@ class OKM_processing:
 
 
         try:
-            # >>> Your real cleaning/validation function goes here <<<
-            load_price_data(self.input_files['Prijslijst'], "PriceList", ['INGREDIENT CODE', 'INGREDIENTS', 'KG'])
-            load_waste_data(self.input_files['Waste lijst'], 'WASTE', ['MEAL CODE', 'INGREDIENT CODE', 'WASTE-NAV', 'WASTE-FIN', 'WASTE-USE'])
-            load_active_rec_data(self.input_files['Actieve lijst'], "Actief", ['Artikel'])
-
-            # For now, we'll simulate cleaned column names.
-            cleaned_columns_file1 = self.fake_clean_and_extract_columns(self.input_files[0])
-            cleaned_columns_file2 = self.fake_clean_and_extract_columns(self.input_files[1])
+            self.price_weight_data = load_price_data(self.input_files['Prijslijst'], "PriceList", ['INGREDIENT CODE', 'INGREDIENTS', 'KG'])
+            self.waste_data = load_waste_data(self.input_files['Waste lijst'], 'WASTE', ['MEAL CODE', 'INGREDIENT CODE', 'WASTE-NAV', 'WASTE-FIN', 'WASTE-USE'])
+            self.active_rec_data = load_active_rec_data(self.input_files['Actieve lijst'], "Actief", ['Artikel'])
+            self.bom_data_raw = pd.read_excel(self.input_files['BOM'], sheet_name="Budget", skiprows=1, header=None, decimal=",")
 
             # Update dropdowns
-            self.column_options[0] = cleaned_columns_file1
-            self.column_options[1] = cleaned_columns_file2
+            self.column_options[0] = self.price_weight_data.columns.to_list()
+            self.column_options[1] = self.active_rec_data.columns.to_list()
 
             for i in range(2):
                 dropdown = self.column_dropdowns[i]
@@ -136,8 +142,12 @@ class OKM_processing:
         self.root.update()
 
         try:
-            # >>> Your real full processing function goes here <<<
-            pass # TODO
+            recipes = processing(price_period=self.selected_columns[0], act_rec_period=self.selected_columns[1],
+                                 bom_data_raw=self.bom_data_raw,
+                                 price_weight_data=self.price_weight_data,
+                                 waste_data=self.waste_data,
+                                 active_rec_data=self.active_rec_data
+                                 )
 
             self.update_status("Processing complete. Please select where to save output.")
 
@@ -148,8 +158,7 @@ class OKM_processing:
                 title="Save Output File"
             )
             if output_path:
-                # >>> Save your actual processed data here <<<
-                self.fake_save_output(output_path)
+                save_output(recipes=recipes, output_path=output_path)
                 self.update_status(f"Output saved to {output_path}")
             else:
                 self.update_status("Output saving cancelled.")

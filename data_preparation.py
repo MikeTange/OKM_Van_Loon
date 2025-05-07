@@ -37,7 +37,7 @@ def clean_dataframe(df : pd.DataFrame, replace_empty_with_na : bool=True):
     df = df.copy()
 
     # Strip whitespace from strings & replace commas with periods as floating points
-    df = df.map(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
+    df = df.applymap(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
 
     # Optionally replace empty strings with pd.NA for better type inference
     if replace_empty_with_na:
