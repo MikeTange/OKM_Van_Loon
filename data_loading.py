@@ -1,8 +1,9 @@
-""" The functions used to load in and carry out an initial clean and validation of the input files """
+""" The functions used to load in and carry out an initial clean and validation (requirements check) of the input files """
 
 
-from parameters import *
 from Recipe import MissingRequirementError
+from typing import Literal
+from parameters import *
 import pandas as pd
 
 
@@ -53,7 +54,7 @@ def clean_dataframe(df : pd.DataFrame, replace_empty_with_na : bool=True) -> pd.
     df = df.copy()
 
     # Strip whitespace from strings & replace commas with periods as floating points
-    df = df.applymap(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
+    df = df.map(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
 
     # Optionally replace empty strings with pd.NA for better type inference
     if replace_empty_with_na:
@@ -69,7 +70,7 @@ def load_bom(file_path : str, sheet_name : str) -> pd.DataFrame:
     """
     Load in the BOM (Bill of Material).
 
-    Processing of the BOM is complex, and will be carried out by a different module (TODO add the module name)
+    Processing of the BOM is complex, and will be carried out by the bom_pre_processing module
 
     Parameters
     ----------
@@ -123,8 +124,10 @@ def load_input(file_path : str, sheet_name : str) -> pd.DataFrame:
     # Rename any columns named: "NaN"
     df = rename_nan_columns(df)
 
+    return df
 
-def check_requirements(df : pd.DataFrame, requirements : list) -> None:
+
+def check_requirements(df : pd.DataFrame, requirements : list[str]) -> None:
     """
     Check if a DataFrame contains all required columns
 
@@ -143,18 +146,16 @@ def check_requirements(df : pd.DataFrame, requirements : list) -> None:
     requirements = set(requirements)
     req_test = requirements.difference(set(df.columns))
     if len(req_test) > 0:
-        raise MissingRequirementError(f'missing one or more required column(s): {req_test}. Either rename existing columns, add new columns, \
-                                      or edit required input columns under "parameters.py"')
-
-    # Clean DataFrame values
-    price_weight_data = clean_dataframe(price_weight_data).astype({"INGREDIENT CODE": 'string', "INGREDIENTS": 'string'}) # fix incorrect type inferences as strings (universally applicable)
+        raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. \
+Either rename existing columns, add new columns, or edit required input columns under "parameters.py"')
 
 
-def load_input_file(file_path : str, sheet_name : str, input_file_type : str) -> pd.DataFrame:
+def load_input_file(file_path : str, sheet_name : str, 
+                    input_file_type : Literal['BOM', 'Prijslijst', 'Waste lijst', 'Actieve lijst']) -> pd.DataFrame:
     """
     Load in and do an initial check of the input file based on its input_file_type.
 
-    BOM files are skipped. All other files get their structures and values stripped and cleaned.
+    BOM files are skipped beyond loading. All other files get their structures and values stripped and cleaned.
 
     Parameters
     ----------
@@ -171,16 +172,16 @@ def load_input_file(file_path : str, sheet_name : str, input_file_type : str) ->
         the output df
     """
 
-    if input_file_type == 'bom':
+    if input_file_type == 'BOM':
         df = load_bom(file_path, sheet_name)
     
-    elif input_file_type == 'price_weight':
+    elif input_file_type == 'Prijslijst':
         df = load_input(file_path, sheet_name)
         check_requirements(df, req_cols_price_weight)
         df = clean_dataframe(df).astype({"INGREDIENT CODE": 'string', 
                                          "INGREDIENTS": 'string'}) # fix incorrect type inferences as strings (universally applicable) (TODO currently hard-coded)
 
-    elif input_file_type == 'waste':
+    elif input_file_type == 'Waste lijst':
         df = load_input(file_path, sheet_name)
         check_requirements(df, req_cols_waste)
         df = clean_dataframe(df).astype({'MEAL CODE': 'string', 
@@ -188,12 +189,12 @@ def load_input_file(file_path : str, sheet_name : str, input_file_type : str) ->
                                          'UNITS': 'string'}) # fix incorrect type inferences as strings (universally applicable) (TODO currently hard-coded)
         df['id'] = df[['MEAL CODE', 'INGREDIENT CODE']].agg('_'.join, axis=1).astype('string') # create a unique id column
 
-    elif input_file_type == 'active':
+    elif input_file_type == 'Actieve lijst':
         df = load_input(file_path, sheet_name)
         check_requirements(df, req_cols_act_rec)
         df = clean_dataframe(df)
 
     else:
-        raise ValueError('incorrect input_file_type. Choose from: "bom", "price_weight", "waste", or "active"')
+        raise ValueError('incorrect input_file_type. Choose from: "BOM", "Prijslijst", "Waste lijst", or "Actieve lijst"')
 
     return df

@@ -79,7 +79,7 @@ class Recipe:
         packagings : np.array
             the item ids which are to be classified as a 'Verpakking'
         id_column : str
-            the name of the self.bom column containing the item ids
+            the name of the Recipe.bom column containing the item ids
         out_col_name : str
             the name of the newly added column
         """
@@ -112,7 +112,7 @@ class Recipe:
                        prices_col : str,
                        price_data_id_col : str,
                        id_column : str='hf_nr', 
-                       out_col_name : str='Nieuwe Prijs') -> None:
+                       out_col_name : str='Nieuwe prijs') -> None:
         """
         Determine a new price for each item in the BOM, and add this to the Recipe BOM.
 
@@ -175,7 +175,7 @@ class Recipe:
                        costs_col : str='Materiaalkosten',
                        quantities_col : str='Aantal (Basis)',
                        id_column : str='hf_nr', 
-                       out_col_name : str='Oude Prijs') -> None:
+                       out_col_name : str='Oude prijs') -> None:
         """
         Calculate the old price for each item in the BOM, and add this to the Recipe BOM.
 
@@ -225,7 +225,7 @@ class Recipe:
     def add_weights(self, 
                     packagings : np.array, 
                     weight_data : pd.DataFrame,
-                    price_data_id_col : str='INGREDIENT CODE',
+                    price_data_id_col : str='INGREDIENT CODE', # TODO - import this from parameters
                     unit_column : str='Basiseenheid',
                     quantities_column : str='Aantal (Basis)',
                     id_column : str='hf_nr', 
@@ -422,12 +422,12 @@ class Recipe:
         MissingRequirementError
             if required columns are missing from the Recipe BOM
         """
-        
+
         # Checking requirements
         requirements = {'Waste NAV', 'Waste USE'}
         req_test = requirements.difference(set(self.bom.columns))
         if len(req_test) > 0:
-            raise MissingRequirementError(f'missing one or more required column(s): {req_test}. Run add_wastes() before attempting to run add_quantities()')
+            raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. Run add_wastes() before attempting to run add_quantities()')
 
         q_no_waste_col = []
         q_new_col = []
@@ -506,8 +506,8 @@ class Recipe:
         requirements = {'Nieuwe prijs', 'Aantal (nieuw)'}
         req_test = requirements.difference(set(self.bom.columns))
         if len(req_test) > 0:
-            raise MissingRequirementError(f'missing one or more required column(s): {req_test}. Run add_new_prices() and add_quantities() \
-                                          before attempting to run add_costs()')
+            raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. Run add_new_prices() and add_quantities() \
+before attempting to run add_costs()')
 
         # Costs - non-HF
         newp_oldq_col = []
@@ -624,8 +624,8 @@ class Recipe:
         requirements = {'Nieuwe prijs', 'Oude prijs', 'Aantal (nieuw)', 'Materiaalkosten (nieuw)', 'Nieuwe vvp'}
         req_test = requirements.difference(set(self.bom.columns))
         if len(req_test) > 0:
-            raise MissingRequirementError(f'missing one or more required column(s): {req_test}. Run add_new_prices() and add_quantities() \
-                                          before attempting to run add_costs()')
+            raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. Run add_old_prices() and add_costs() \
+before attempting to run add_deltas()')
 
         delta_q_col = []
         delta_p_col = []
@@ -663,3 +663,50 @@ class Recipe:
         self.bom[out_col_name_delta_p] = delta_p_col
         self.bom[out_col_name_delta_cost] = delta_cost_col
         self.bom[out_col_name_delta_waste] = fin_waste_impact_col
+
+    
+    def process(self,
+                ingredients : np.array, 
+                HFs : np.array, 
+                packagings : np.array,
+                price_data : pd.DataFrame,
+                prices_col : str,
+                price_data_id_col : str,
+                weight_data : pd.DataFrame,
+                waste_data : pd.DataFrame) -> None:
+        """ 
+        Fully process the Recipe.
+
+        Parameters
+        ----------
+        ingredients : np.array
+            the item ids which are to be classified as an 'Ingredient'
+        HFs : np.array
+            the item ids which are to be classified as a 'Halffabrikaat'
+        packagings : np.array
+            the item ids which are to be classified as a 'Verpakking'
+        price_data : pd.DataFrame
+            DataFrame containing the price data
+        prices_col : str
+            the name of the price_data column containing the new prices
+        price_data_id_col : str
+            the name of the price_data column containing the item ids
+        weight_data : pd.DataFrame
+            DataFrame containing the weight data
+        waste_data : pd.Dataframe
+            DataFrame containing the waste data
+            
+        Returns
+        -------
+        recipe : Recipe
+            the processed Recipe object
+        """
+
+        self.add_categories(ingredients, HFs, packagings)
+        self.add_new_prices(ingredients, HFs, packagings, price_data, prices_col, price_data_id_col)
+        self.add_old_prices(ingredients, HFs, packagings)
+        self.add_weights(packagings, weight_data)
+        self.add_wastes(HFs, waste_data)
+        self.add_quantities()
+        self.add_costs(ingredients, HFs, packagings)
+        self.add_deltas()
