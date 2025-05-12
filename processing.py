@@ -2,6 +2,7 @@
 
 
 from Recipe import *
+from typing import Callable
 
 
 def process_recipes(recipes : list,
@@ -12,7 +13,8 @@ def process_recipes(recipes : list,
                     prices_col : str,
                     price_data_id_col : str,
                     weight_data : pd.DataFrame,
-                    waste_data : pd.DataFrame) -> list[Recipe]:
+                    waste_data : pd.DataFrame,
+                    update_progress : Callable=None) -> list[Recipe]:
     """ 
     Process all Recipes in the recipes list
 
@@ -42,8 +44,13 @@ def process_recipes(recipes : list,
     recipes : list[Recipe]
         list of processed Recipe objects
     """
+    max_recipes = len(recipes) + 0.001
 
+    i = 0
     for recipe in recipes:
         recipe.process(ingredients, HFs, packagings, price_data, prices_col, price_data_id_col, weight_data, waste_data)
+        if update_progress:
+            update_progress(value=i, maximum=max_recipes)
+        i += 1
 
     return recipes

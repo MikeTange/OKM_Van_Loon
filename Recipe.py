@@ -427,7 +427,7 @@ class Recipe:
         requirements = {'Waste NAV', 'Waste USE'}
         req_test = requirements.difference(set(self.bom.columns))
         if len(req_test) > 0:
-            raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. Run add_wastes() before attempting to run add_quantities()')
+            raise MissingRequirementError(f'missing one or more required column(s): {", ".join(req_test)}. Run add_wastes() before attempting to run add_quantities()')
 
         q_no_waste_col = []
         q_new_col = []
@@ -506,7 +506,7 @@ class Recipe:
         requirements = {'Nieuwe prijs', 'Aantal (nieuw)'}
         req_test = requirements.difference(set(self.bom.columns))
         if len(req_test) > 0:
-            raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. Run add_new_prices() and add_quantities() \
+            raise MissingRequirementError(f'missing one or more required column(s): {", ".join(req_test)}. Run add_new_prices() and add_quantities() \
 before attempting to run add_costs()')
 
         # Costs - non-HF
@@ -624,7 +624,7 @@ before attempting to run add_costs()')
         requirements = {'Nieuwe prijs', 'Oude prijs', 'Aantal (nieuw)', 'Materiaalkosten (nieuw)', 'Nieuwe vvp'}
         req_test = requirements.difference(set(self.bom.columns))
         if len(req_test) > 0:
-            raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. Run add_old_prices() and add_costs() \
+            raise MissingRequirementError(f'missing one or more required column(s): {", ".join(req_test)}. Run add_old_prices() and add_costs() \
 before attempting to run add_deltas()')
 
         delta_q_col = []

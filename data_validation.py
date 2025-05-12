@@ -10,12 +10,14 @@ Data validation will optionally also produce an output Excel file containing all
 import warnings
 import numpy as np
 import pandas as pd
+from typing import Callable
 
 
 def check_ingr_prices(ingredients : np.array,
                       price_data : pd.DataFrame,
                       prices_col : str,
-                      price_data_id_col : str='INGREDIENT CODE') -> dict:
+                      price_data_id_col : str='INGREDIENT CODE',
+                      update_callback : Callable=None) -> dict:
     """
     Check if all item classified as ingredients have a new price.
 
@@ -29,6 +31,8 @@ def check_ingr_prices(ingredients : np.array,
         the name of the price_data column containing the new prices
     price_data_id_column : str
         the name of the price_data column containing the item ids
+    update_callback : Callable
+        the update_callback function to use to pass feedback to the user
 
     Returns
     -------
@@ -44,17 +48,23 @@ def check_ingr_prices(ingredients : np.array,
         if len(subset) == 1:
             try:
                 price = float(subset[prices_col].iloc[0])
-            except ValueError:
+            except (ValueError, TypeError):
+                if update_callback:
+                    update_callback(f'Kan de prijs voor ingredient {ing} niet lezen. Prijs: "{subset[prices_col][0]}"')
                 warnings.warn(f'Kan de prijs voor ingredient {ing} niet lezen. Prijs: "{subset[prices_col][0]}"')
                 fails[ing] = [f'Kan de prijs niet lezen. Prijs: "{subset[prices_col][0]}"',
                               'ingredient validation'] # add as validation type
         
         elif len(subset) == 0:
+            if update_callback:
+                    update_callback(f'Ingredient {ing} komt niet voor in de prijslijst')
             warnings.warn(f'Ingredient {ing} komt niet voor in de prijslijst')
             fails[ing] = [f'Ingredient komt niet voor in de prijslijst',
                            'ingredient validation'] # add as validation type
 
         else:
+            if update_callback:
+                    update_callback(f'Ingredient {ing} komt meermaals voor in de prijslijst. Indexen: {subset["index"]}')
             warnings.warn(f'Ingredient {ing} komt meermaals voor in de prijslijst. Indexen: {subset["index"]}')
             fails[ing] = [f'Ingredient komt meermaals voor in de prijslijst. Indexen: {subset["index"]}',
                           'ingredient validation'] # add as validation type
@@ -70,7 +80,8 @@ def check_wastes(recipes : list,
                  waste_data_fin_col : str='WASTE-FIN',
                  waste_data_use_col : str='WASTE-USE',
                  id_column : str='hf_nr',
-                 level_column : str='Niveau') -> dict:
+                 level_column : str='Niveau',
+                 update_callback : Callable=None) -> dict:
     """
     Check if all level 1 items have waste percentages.
 
@@ -94,6 +105,8 @@ def check_wastes(recipes : list,
         the name of the Recipe.bom column containing the item ids
     level_column : str
         the name of the Recipe.bom column containing the levels
+    update_callback : Callable
+        the update_callback function to use to pass feedback to the user
 
     Returns
     -------
@@ -118,19 +131,26 @@ def check_wastes(recipes : list,
                         use = subset[waste_data_use_col].iloc[0]
                         try:
                             waste = float(nav) + float(fin) + float(use)
-                        except ValueError:
+                        except (ValueError, TypeError):
+                            if update_callback:
+                                update_callback(f'Kan de waste voor level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" niet lezen. \
+Waste-nav: "{nav}", Waste-fin: "{fin}", Waste-use: "{use}"')
                             warnings.warn(f'Kan de waste voor level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" niet lezen. \
-                                            Waste-nav: "{nav}", Waste-fin: "{fin}", Waste-use: "{use}"')
+Waste-nav: "{nav}", Waste-fin: "{fin}", Waste-use: "{use}"')
                             fails[waste_id] = [f'Kan de waste voor level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" niet lezen. \
-                                                Waste-nav: "{nav}", Waste-fin: "{fin}", Waste-use: "{use}"', 
+Waste-nav: "{nav}", Waste-fin: "{fin}", Waste-use: "{use}"', 
                                                 'waste validation'] # add as validation type
 
                     elif len(subset) == 0:
+                        if update_callback:
+                                update_callback(f'Level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" komt niet voor in de waste lijst')
                         warnings.warn(f'Level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" komt niet voor in de waste lijst')
                         fails[waste_id] = [f'Level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" komt niet voor in de waste lijst',
                                            'waste validation'] # add as validation type
 
                     else:
+                        if update_callback:
+                                update_callback(f'Level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" komt meermaals voor in de waste lijst')
                         warnings.warn(f'Level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" komt meermaals voor in de waste lijst')
                         fails[waste_id] = [f'Level 1 item: "{item_id}", voor maaltijd: "{recipe.id}" komt meermaals voor in de waste lijst', 
                                            'waste validation'] # add as validation type
@@ -140,7 +160,8 @@ def check_wastes(recipes : list,
 
 def output_validation_fails(fails : pd.DataFrame,
                             output_path : str='Data Validation.xlsx',
-                            output_file_sheet_name : str='Data Validation Fails') -> None:
+                            output_file_sheet_name : str='Data Validation Fails',
+                            update_callback : Callable=None) -> None:
     """ 
     Generate an output Excel file containing data validation fails.
 
@@ -152,10 +173,14 @@ def output_validation_fails(fails : pd.DataFrame,
         the path of the output Excel file including the name
     output_file_sheet_name : str
         the name of the output Excel file sheet name
+    update_callback : Callable
+        the update_callback function to use to pass feedback to the user
     """
 
     with pd.ExcelWriter(output_path) as writer:
         fails.to_excel(writer, sheet_name=output_file_sheet_name)
+        if update_callback:
+            update_callback(f'{len(fails)} data validation issues encountered. Output file saved: {output_path}')
 
 
 def validate_data(ingredients : np.array,
@@ -166,7 +191,8 @@ def validate_data(ingredients : np.array,
                   waste_data : pd.DataFrame,
                   waste_data_nav_col : str='WASTE-NAV',
                   waste_data_fin_col : str='WASTE-FIN',
-                  waste_data_use_col : str='WASTE-USE') -> None:
+                  waste_data_use_col : str='WASTE-USE',
+                  update_callback : Callable=None) -> None:
     """
     Run the full data validation.
 
@@ -184,16 +210,18 @@ def validate_data(ingredients : np.array,
         the ids of the packaging items
     waste_data : pd.DataFrame
         DataFrame containing the waste data
+    update_callback : Callable
+        the update_callback function to use to pass feedback to the user
     """
 
-    ingredient_fails = check_ingr_prices(ingredients, price_data, prices_col)
+    ingredient_fails = check_ingr_prices(ingredients, price_data, prices_col, update_callback=update_callback)
 
     # Fix any data casting errors that may slipped through
     # Difficult to catch these before this point, but not ideal currently...
     if (price_data[prices_col].dtype == 'O') and (len(ingredient_fails) == 0):
         price_data[prices_col].astype('float64') # TODO - test whether this actually works or if it needs to be move out of this function
 
-    waste_fails = check_wastes(recipes, packagings, waste_data)
+    waste_fails = check_wastes(recipes, packagings, waste_data, update_callback=update_callback)
 
     # Fix any data casting errors that may slipped through
     # Difficult to catch these before this point, but not ideal currently...
@@ -210,4 +238,4 @@ def validate_data(ingredients : np.array,
 
     if fails_dict:
         fails_df = pd.DataFrame.from_dict(fails_dict, orient='index', columns=['error', 'type'])
-        output_validation_fails(fails_df)
+        output_validation_fails(fails_df, update_callback=update_callback)

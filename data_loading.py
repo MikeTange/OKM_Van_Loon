@@ -5,6 +5,7 @@ from Recipe import MissingRequirementError
 from typing import Literal
 from parameters import *
 import pandas as pd
+import numpy as np
 
 
 def rename_nan_columns(df : pd.DataFrame, prefix : str="col") -> pd.DataFrame:
@@ -32,7 +33,7 @@ def rename_nan_columns(df : pd.DataFrame, prefix : str="col") -> pd.DataFrame:
     return df
 
 
-def clean_dataframe(df : pd.DataFrame, replace_empty_with_na : bool=True) -> pd.DataFrame:
+def clean_dataframe(df : pd.DataFrame, replace_empty_with_nan : bool=True) -> pd.DataFrame:
     """
     Cleans a DataFrame by:
     - Stripping whitespace from string values
@@ -54,11 +55,11 @@ def clean_dataframe(df : pd.DataFrame, replace_empty_with_na : bool=True) -> pd.
     df = df.copy()
 
     # Strip whitespace from strings & replace commas with periods as floating points
-    df = df.map(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
+    df = df.applymap(lambda x: x.replace(',', '.').strip() if isinstance(x, str) else x)
 
     # Optionally replace empty strings with pd.NA for better type inference
-    if replace_empty_with_na:
-        df.replace("", pd.NA, inplace=True)
+    if replace_empty_with_nan:
+        df.replace("", np.nan, inplace=True)
 
     # Infer column types
     df = df.convert_dtypes()
@@ -94,7 +95,7 @@ def load_input(file_path : str, sheet_name : str) -> pd.DataFrame:
     """
     Load in an input Excel file and turn it into a DataFrame with clean structure
 
-    The Excel file is stripped of empty leading rows. All columns get given a unique name, inferred based on the first meaningful row; 
+    The Excel file is stripped of empty leading rows. All columns get given a unique header, inferred based on the first meaningful row; 
         otherwise generic
 
     Parameters
@@ -146,7 +147,7 @@ def check_requirements(df : pd.DataFrame, requirements : list[str]) -> None:
     requirements = set(requirements)
     req_test = requirements.difference(set(df.columns))
     if len(req_test) > 0:
-        raise MissingRequirementError(f'missing one or more required column(s): {', '.join(req_test)}. \
+        raise MissingRequirementError(f'missing one or more required column(s): {", ".join(req_test)}. \
 Either rename existing columns, add new columns, or edit required input columns under "parameters.py"')
 
 
