@@ -3,7 +3,9 @@
 
 import pandas as pd
 import numpy as np
+import warnings
 
+warnings.filterwarnings('error', category=RuntimeWarning)
 
 class MissingRequirementError(Exception):
     """ error to to raise for missing required columns for a method"""
@@ -206,7 +208,10 @@ class Recipe:
             item_id = self.bom[id_column][i]
 
             if item_id in ingredients:
-                old_price = self.bom[costs_col][i] / self.bom[quantities_col][i]
+                try:
+                    old_price = self.bom[costs_col][i] / self.bom[quantities_col][i]
+                except Exception as e: # divide by 0 error
+                    old_price = np.nan
             
             elif item_id in packagings:
                 old_price = 0

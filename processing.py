@@ -1,8 +1,10 @@
 """ Processing the OKM data """
 
 
+from threading import Event
+from queue import Queue
 from Recipe import *
-from typing import Callable
+import time
 
 
 def process_recipes(recipes : list,
@@ -14,7 +16,9 @@ def process_recipes(recipes : list,
                     price_data_id_col : str,
                     weight_data : pd.DataFrame,
                     waste_data : pd.DataFrame,
-                    update_progress : Callable=None) -> list[Recipe]:
+                    progress_queue : Queue=None,
+                    result_queue : Queue=None,
+                    result_event : Event=None) -> list[Recipe]:
     """ 
     Process all Recipes in the recipes list
 
@@ -48,9 +52,19 @@ def process_recipes(recipes : list,
 
     i = 0
     for recipe in recipes:
+        if i % 10 == 0:
+            time.sleep(0.001)  # give CPU time to breathe
         recipe.process(ingredients, HFs, packagings, price_data, prices_col, price_data_id_col, weight_data, waste_data)
-        if update_progress:
-            update_progress(value=i, maximum=max_recipes)
+        if progress_queue:
+            value = (i / max_recipes) * 100
+            progress_queue.put(value)
         i += 1
 
-    return recipes
+    if progress_queue and result_queue and result_event: # signal that the function is done if using multithreading
+            value = 'done'
+            progress_queue.put(value)
+            result_queue.put(recipes)
+            result_event.set()
+    
+    else:
+        return recipes

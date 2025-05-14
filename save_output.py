@@ -74,12 +74,12 @@ def save_output(recipes : list,
 
     frames = []
     for recipe in recipes:
-        frames.append(recipe.data)
+        frames.append(recipe.bom)
 
     df = pd.concat(frames)
 
     # Reorder and drop columns
-    df = df[[out_col_order]]
+    df = df[out_col_order]
 
     # Rename columns
     df = df.rename(columns=out_col_renames)
