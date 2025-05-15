@@ -2,7 +2,7 @@
 
 
 from Recipe import MissingRequirementError
-from typing import Literal
+from typing import Literal, Callable
 from parameters import *
 import pandas as pd
 import numpy as np
@@ -128,7 +128,10 @@ def load_input(file_path : str, sheet_name : str) -> pd.DataFrame:
     return df
 
 
-def check_requirements(df : pd.DataFrame, requirements : list[str]) -> None:
+def check_requirements(df : pd.DataFrame, 
+                       requirements : list[str],
+                       input_file_type : Literal['BOM', 'Prijslijst', 'Waste lijst', 'Actieve lijst'], 
+                       update_callback : Callable=None) -> None:
     """
     Check if a DataFrame contains all required columns
 
@@ -136,6 +139,8 @@ def check_requirements(df : pd.DataFrame, requirements : list[str]) -> None:
         the DataFrame to check
     requirement : list
         the column names which are required
+    update_callback : Callable
+        the update_callback function to use to pass feedback to the user
 
     Raises
     ------
@@ -147,12 +152,16 @@ def check_requirements(df : pd.DataFrame, requirements : list[str]) -> None:
     requirements = set(requirements)
     req_test = requirements.difference(set(df.columns))
     if len(req_test) > 0:
-        raise MissingRequirementError(f'missing one or more required column(s): {", ".join(req_test)}. \
+        update_callback(f'For input file {input_file_type}; missing one or more required column(s): {", ".join(req_test)}. \
+Either rename existing columns, add new columns, or edit required input columns under "parameters.py"')
+        raise MissingRequirementError(f'for input file {input_file_type}; missing one or more required column(s): {", ".join(req_test)}. \
 Either rename existing columns, add new columns, or edit required input columns under "parameters.py"')
 
 
-def load_input_file(file_path : str, sheet_name : str, 
-                    input_file_type : Literal['BOM', 'Prijslijst', 'Waste lijst', 'Actieve lijst']) -> pd.DataFrame:
+def load_input_file(file_path : str, 
+                    sheet_name : str, 
+                    input_file_type : Literal['BOM', 'Prijslijst', 'Waste lijst', 'Actieve lijst'],
+                    update_callback : Callable=None) -> pd.DataFrame:
     """
     Load in and do an initial check of the input file based on its input_file_type.
 
@@ -166,6 +175,8 @@ def load_input_file(file_path : str, sheet_name : str,
         the name of the relevant Excel sheet
     input_file_type : str
         the type of input file
+    update_callback : Callable
+        the update_callback function to use to pass feedback to the user
 
     Returns
     -------
@@ -178,13 +189,13 @@ def load_input_file(file_path : str, sheet_name : str,
     
     elif input_file_type == 'Prijslijst':
         df = load_input(file_path, sheet_name)
-        check_requirements(df, req_cols_price_weight)
+        check_requirements(df, req_cols_price_weight, input_file_type, update_callback=update_callback)
         df = clean_dataframe(df).astype({"INGREDIENT CODE": 'string', 
                                          "INGREDIENTS": 'string'}) # fix incorrect type inferences as strings (universally applicable) (TODO currently hard-coded)
 
     elif input_file_type == 'Waste lijst':
         df = load_input(file_path, sheet_name)
-        check_requirements(df, req_cols_waste)
+        check_requirements(df, req_cols_waste, input_file_type, update_callback=update_callback)
         df = clean_dataframe(df).astype({'MEAL CODE': 'string', 
                                          'INGREDIENT CODE': 'string', 
                                          'UNITS': 'string'}) # fix incorrect type inferences as strings (universally applicable) (TODO currently hard-coded)
@@ -192,10 +203,11 @@ def load_input_file(file_path : str, sheet_name : str,
 
     elif input_file_type == 'Actieve lijst':
         df = load_input(file_path, sheet_name)
-        check_requirements(df, req_cols_act_rec)
+        check_requirements(df, req_cols_act_rec, input_file_type, update_callback=update_callback)
         df = clean_dataframe(df)
 
     else:
+        update_callback(f'Incorrect input_file_type. Choose from: "BOM", "Prijslijst", "Waste lijst", or "Actieve lijst"')
         raise ValueError('incorrect input_file_type. Choose from: "BOM", "Prijslijst", "Waste lijst", or "Actieve lijst"')
 
     return df

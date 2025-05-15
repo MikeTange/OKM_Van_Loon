@@ -1,3 +1,4 @@
+from openpyxl.worksheet.table import Table, TableStyleInfo
 import pandas as pd
 
 
@@ -53,7 +54,8 @@ def save_output(recipes : list,
                                         'Delta Q': 'Materiaalkosten (Q-effect 3.0 vs 1.0) (€)',
                                         'Delta prijs': 'Materiaalkosten (P-effect 3.0 vs 1.0) (€)',
                                         'Delta FIN waste': 'FIN Waste Impact Waste Update (Delta 3.0 vs 2.0) (€)',
-                                        'Grammage': 'Gewicht (kg)'}) -> None:
+                                        'Grammage': 'Gewicht (kg)'},
+                xl_tbl_name : str='BOM') -> None:
     """
     Save the output to Excel by combining all the Recipes together, and renaming / dropping columns
 
@@ -70,6 +72,8 @@ def save_output(recipes : list,
         Leaving (or commenting) a column out will drop it
     out_col_renames : dict
         dictionary renaming the columns
+    xl_tbl_name : str
+        the name of the Excel Table the data will be outputted to
     """
 
     frames = []
@@ -84,5 +88,22 @@ def save_output(recipes : list,
     # Rename columns
     df = df.rename(columns=out_col_renames)
     
-    with pd.ExcelWriter(output_path) as writer:
-        df.to_excel(writer, sheet_name=output_file_sheet_name)
+    with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name=output_file_sheet_name, index=False)
+
+        # Create an Excel Table
+        worksheet = writer.sheets[output_file_sheet_name]
+
+        num_rows, num_cols = df.shape
+        last_col_letter = chr(ord('A') + num_cols - 1)  # Assumes <= 26 columns
+        table_range = f"A1:{last_col_letter}{num_rows + 1}"
+
+        table = Table(displayName=xl_tbl_name, ref=table_range)
+
+        style = TableStyleInfo(
+            name="TableStyleMedium9", showFirstColumn=False,
+            showLastColumn=False, showRowStripes=True, showColumnStripes=False
+        )
+        table.tableStyleInfo = style
+
+        worksheet.add_table(table)

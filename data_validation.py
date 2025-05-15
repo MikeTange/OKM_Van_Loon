@@ -7,10 +7,11 @@ Data validation is two-fold:
 Data validation will optionally also produce an output Excel file containing all data validation fails.
 """
 
-import warnings
-import numpy as np
-import pandas as pd
+from openpyxl.worksheet.table import Table, TableStyleInfo
 from typing import Callable
+import pandas as pd
+import numpy as np
+import warnings
 
 
 def check_ingr_prices(ingredients : np.array,
@@ -161,7 +162,8 @@ Waste-nav: "{nav}", Waste-fin: "{fin}", Waste-use: "{use}"',
 def output_validation_fails(fails : pd.DataFrame,
                             output_path : str='Data Validation.xlsx',
                             output_file_sheet_name : str='Data Validation Fails',
-                            update_callback : Callable=None) -> None:
+                            update_callback : Callable=None,
+                            xl_tbl_name : str='Errors') -> None:
     """ 
     Generate an output Excel file containing data validation fails.
 
@@ -175,10 +177,33 @@ def output_validation_fails(fails : pd.DataFrame,
         the name of the output Excel file sheet name
     update_callback : Callable
         the update_callback function to use to pass feedback to the user
+    xl_tbl_name : str
+        the name of the Excel Table the data will be outputted to
     """
 
+    fails = fails.reset_index(names='ID')
+
     with pd.ExcelWriter(output_path) as writer:
-        fails.to_excel(writer, sheet_name=output_file_sheet_name)
+        fails.to_excel(writer, sheet_name=output_file_sheet_name, index=False)
+
+        # Create an Excel Table
+        worksheet = writer.sheets[output_file_sheet_name]
+
+        num_rows, num_cols = fails.shape
+        last_col_letter = chr(ord('A') + num_cols - 1)  # Assumes <= 26 columns
+        table_range = f"A1:{last_col_letter}{num_rows + 1}"
+
+        table = Table(displayName=xl_tbl_name, ref=table_range)
+
+        style = TableStyleInfo(
+            name="TableStyleMedium9", showFirstColumn=False,
+            showLastColumn=False, showRowStripes=True, showColumnStripes=False
+        )
+        table.tableStyleInfo = style
+
+        worksheet.add_table(table)
+
+
         if update_callback:
             update_callback(f'{len(fails)} data validation issues encountered. Output file saved: {output_path}')
 
