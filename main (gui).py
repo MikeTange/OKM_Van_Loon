@@ -2,7 +2,6 @@ from tkinter import filedialog, messagebox, ttk
 from bom_pre_processing import *
 from data_validation import *
 from product_master import *
-from typing import Literal
 from data_loading import *
 from save_output import *
 from processing import *
@@ -543,7 +542,7 @@ class OKM_processing:
         Parameters
         ----------
         result : list
-            the list the results
+            the list containing the processing results
         """
 
         recipes = result  # Store results

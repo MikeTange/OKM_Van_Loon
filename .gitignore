@@ -1,3 +1,4 @@
 # Set-up files to ignore
 *xlsx
 *.exe
+*.ipynb
